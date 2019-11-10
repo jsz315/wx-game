@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "oimo": "^1.0.9",
+    "three": "^0.110.0"
+  },
+  "miniprogram": "miniprogram_npm",
+  "scripts": {
+    "compile": "./node_modules/typescript/bin/tsc",
+    "tsc": "node ./node_modules/typescript/lib/tsc.js"
+  }
+}
