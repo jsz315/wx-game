@@ -3,6 +3,7 @@ let OrbitControls = require('../miniprogram_npm/three-orbit-controls/index.js')(
 const OIMO = require('./libs/oimo/index.js')
 import PhysicsView from './core/PhysicsView.js';
 import Store from './core/Store.js';
+import Rank from './ui/Rank.js';
 
 /**
  * 游戏主函数
@@ -90,6 +91,10 @@ export default class Main {
       let physicsView = new PhysicsView(mesh, true, this.world);
       this.updaters.push(physicsView);
     }
+
+    this.rank = new Rank();
+    this.rank.draw("hello");
+    this.scene.add(this.rank.view);
   }
 
   update() {
