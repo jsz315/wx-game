@@ -1,13 +1,13 @@
 
-import * as THREE from '../../miniprogram_npm/three/index'
-// import { OrbitControls } from '../../miniprogram_npm/three/examples/jsm/controls/OrbitControls';
+import * as THREE from 'three'
+// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import PhysicsView from './PhysicsView';
 import Store from './Store';
 import Fire from './Fire';
 // import ComputeGeometry from './ComputeGeometry';
 
 // import * as Ammo from '../asset/lib/ammo'
-const OIMO = require('../../miniprogram_npm/oimo/index')
+const OIMO = require('oimo')
 
 console.log("oimo");
 console.log(OIMO);
@@ -123,10 +123,14 @@ export default class App{
         this.world.add({size: size, pos: position, rot: rotation, move: false});
 
         var  ToRad = 0.0174532925199432957;
-        let mat: THREE.MeshStandardMaterial = new THREE.MeshStandardMaterial();
-        mat.metalness = 0.1;
-        mat.roughness = 0.72;
-        mat.map = new THREE.TextureLoader().load("images/img/p6.jpg");
+
+        // let mat: THREE.MeshStandardMaterial = new THREE.MeshStandardMaterial();
+        // mat.metalness = 0.1;
+        // mat.roughness = 0.72;
+        // mat.map = new THREE.TextureLoader().load("images/img/p6.jpg");
+
+        let mat: THREE.MeshNormalMaterial = new THREE.MeshNormalMaterial();
+
         var mesh = new THREE.Mesh( new THREE.BoxGeometry(), mat );
         mesh.scale.set( size[0], size[1], size[2] );
         mesh.position.set( position[0], position[1], position[2] );

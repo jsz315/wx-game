@@ -1,4 +1,3 @@
-import * as THREE from "../miniprogram_npm/three/index"
 import Foo from './foo'
 import App from './core/App'
 import { canvas } from "./libs/weapp-adapter";

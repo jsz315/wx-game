@@ -1,5 +1,5 @@
-import * as THREE from "../../miniprogram_npm/three/index";
-import OIMO from '../../miniprogram_npm/oimo/index'
+import * as THREE from "three";
+import OIMO from 'oimo'
 
 export default class Store{
 
@@ -15,12 +15,14 @@ export default class Store{
             let size = 0.2 + Math.random() * 2;
             this.boxGeos.push(new THREE.BoxGeometry(size, size, size));
 
-            let color = new THREE.Color(0xffffff);
-            let mat:THREE.MeshStandardMaterial = new THREE.MeshStandardMaterial({color});
-            mat.map = new THREE.TextureLoader().load("images/img/m" + (i % 6 + 1) + ".jpg");
-            mat.emissive = new THREE.Color(0, 0, 0);
-            mat.metalness = 0.1;
-            mat.roughness = 0.7;
+            // let color = new THREE.Color(0xffffff);
+            // let mat:THREE.MeshStandardMaterial = new THREE.MeshStandardMaterial({color});
+            // mat.map = new THREE.TextureLoader().load("images/img/m" + (i % 6 + 1) + ".jpg");
+            // mat.emissive = new THREE.Color(0, 0, 0);
+            // mat.metalness = 0.1;
+            // mat.roughness = 0.7;
+
+            let mat:THREE.MeshNormalMaterial = new THREE.MeshNormalMaterial();
             this.mats.push(mat);
         }
         

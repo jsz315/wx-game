@@ -1,5 +1,5 @@
-import * as THREE from "../../miniprogram_npm/three/index";
-import OIMO from '../../miniprogram_npm/oimo/index'
+import * as THREE from "three";
+import OIMO from 'oimo'
 
 export default class PhysicsView{
 
