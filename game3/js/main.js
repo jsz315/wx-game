@@ -3,7 +3,10 @@ let OrbitControls = require('../miniprogram_npm/three-orbit-controls/index.js')(
 const OIMO = require('./libs/oimo/index.js')
 import PhysicsView from './core/PhysicsView.js';
 import Store from './core/Store.js';
-import Rank from './ui/Rank.js';
+import InterView from './ui/InterView.js';
+import DataCenter from './core/DataCenter.js';
+
+let { pixelRatio, windowHeight, windowWidth } = DataCenter;
 
 /**
  * 游戏主函数
@@ -17,7 +20,7 @@ export default class Main {
 
     this.canvas = canvas;
 
-    this.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.2, 2000);
+    this.camera = new THREE.PerspectiveCamera(60, windowWidth / windowHeight, 0.2, 2000);
     this.camera.position.set(-25, 25, 78);
     this.camera.lookAt(new THREE.Vector3());
 
@@ -28,19 +31,37 @@ export default class Main {
       antialias: true,
       alpha: true
     });
+    this.renderer.autoClear = false;
+
     this.renderer.setClearColor(0x000000);
-    this.renderer.setPixelRatio(window.devicePixelRatio);
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setPixelRatio(pixelRatio);
+    this.renderer.setSize(windowWidth, windowHeight);
     this.renderer.shadowMap.enabled = true;
 
-    new OrbitControls(this.camera, this.canvas);
+    this.orbitControls = new OrbitControls(this.camera, this.canvas);
 
+    this.initLight();
     this.initViews();
 
     window.requestAnimationFrame(
       this.loop.bind(this),
       canvas
     )
+  }
+
+  initLight(){
+    this.scene.add(new THREE.AmbientLight(0x3D4143));
+    var light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(300, 1000, 500);
+    light.target.position.set(0, 0, 0);
+    light.castShadow = true;
+    var n = 300;
+    light.shadow.camera = new THREE.OrthographicCamera(-n, n, n, -n, 500, 1600);
+    light.shadow.bias = 0.0001;
+    light.shadow.mapSize.width = light.shadow.mapSize.height = 1024;
+    this.scene.add(light);
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = THREE.PCFShadowMap;
   }
   
   initViews(){
@@ -55,18 +76,11 @@ export default class Main {
     this.updaters = [];
     this.store = new Store();
 
-    var ambientLight = new THREE.AmbientLight(0xffffff);
-    this.scene.add(ambientLight);
-
-    var directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    directionalLight.position.set(10, 10, -10);
-    this.scene.add(directionalLight);
-
     var mat = new THREE.MeshStandardMaterial({color: 0x00ff00});
     mat.map = new THREE.TextureLoader().load("images/texture/m1.jpg");
     mat.emissive = new THREE.Color(0, 0, 0);
 
-    let ground = new THREE.Mesh(new THREE.BoxGeometry(80, 4, 80), mat);
+    let ground = new THREE.Mesh(new THREE.BoxGeometry(100, 4, 100), mat);
     this.scene.add(ground);
     ground.castShadow = true;
     ground.receiveShadow = true;
@@ -75,9 +89,8 @@ export default class Main {
     new PhysicsView(ground, false, this.world);
 
     let mesh;
-    let t;
     let types = ["box", "sphere", "cylinder"];
-    for(let i = 0; i < 90; i++){
+    for(let i = 0; i < 40; i++){
       let geo = this.store.getBufferGeometry(types[i % 3]);
       mesh = new THREE.Mesh(geo, this.store.getMaterial());
       
@@ -92,9 +105,32 @@ export default class Main {
       this.updaters.push(physicsView);
     }
 
-    this.rank = new Rank();
-    this.rank.draw("hello");
-    this.scene.add(this.rank.view);
+    this.interView = new InterView();
+
+    this.canvas.addEventListener('touchstart', this.uiCheck.bind(this), {passive: false}); 
+    // this.canvas.addEventListener('touchmove', this.uiCheck.bind(this), {passive: false}); 
+    // this.canvas.addEventListener('touchend', this.uiCheck.bind(this), {passive: false}); 
+
+    DataCenter.gameEvent.on("shadow", () => {
+      console.log("shadow");
+      this.renderer.shadowMap.enabled = !this.renderer.shadowMap.enabled;
+      // mat.map.needsUpdate = true;
+      mat.needsUpdate = true;
+    })
+
+    console.log("this");
+    console.log(this);
+  }
+
+  uiCheck(e){
+    var hit = DataCenter.checkClick(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+    // var hit = this.interView.checkClick(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+    if(hit){
+      this.orbitControls.enabled = false;
+    }
+    else{
+      this.orbitControls.enabled = true;
+    }
   }
 
   update() {
@@ -102,7 +138,11 @@ export default class Main {
     this.updaters.forEach(item=>{
       item.update();
     })
+    this.renderer.clear();
     this.renderer.render(this.scene, this.camera);
+    this.renderer.clearDepth();
+    this.interView.draw();
+    this.renderer.render(this.interView.scene, this.interView.camera);
   }
 
   // 实现游戏帧循环

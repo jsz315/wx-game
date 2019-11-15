@@ -21,7 +21,7 @@ export default class Sprite {
   drawToCanvas(ctx) {
     if ( !this.visible )
       return
-
+    ctx.save();
     ctx.drawImage(
       this.img,
       this.x,
@@ -29,6 +29,7 @@ export default class Sprite {
       this.width,
       this.height
     )
+    ctx.restore();
   }
 
   /**

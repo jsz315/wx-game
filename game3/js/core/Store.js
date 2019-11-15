@@ -8,7 +8,7 @@ export default class Store{
         this.cylinderGeos = [];
 
         for(var i = 0; i < 8; i++){
-            let size = 0.4 + Math.random() * 4;
+            let size = 0.8 + Math.random() * 8;
             this.sphereGeos.push(new THREE.SphereGeometry(size, 10, 10));
             this.boxGeos.push(new THREE.BoxGeometry(size, size, size));
             this.cylinderGeos.push(new THREE.CylinderGeometry(size, size, size));
