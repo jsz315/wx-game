@@ -1,13 +1,16 @@
 let { pixelRatio, windowHeight, windowWidth } = wx.getSystemInfoSync();
 pixelRatio = Math.min(pixelRatio, 2);
+let uiWidth = windowWidth * pixelRatio;
+let uiHeight = windowHeight * pixelRatio;
+let fitScale = uiWidth / 750;
 
 let listeners = [];
 
-function checkClick(x, y){
+function checkClick(x, y) {
     x = x * pixelRatio;
     y = y * pixelRatio;
-    for(var j = listeners.length - 1; j >= 0; j--){
-        if(listeners[j].callback && listeners[j].checkClick(x, y)){
+    for (var j = listeners.length - 1; j >= 0; j--) {
+        if (listeners[j].callback && listeners[j].checkClick(x, y)) {
             return true;
         }
     }
@@ -41,6 +44,9 @@ export default {
     pixelRatio,
     windowWidth,
     windowHeight,
+    uiWidth,
+    uiHeight,
+    fitScale,
     listeners,
     checkClick,
     gameEvent
