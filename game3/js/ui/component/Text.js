@@ -53,6 +53,11 @@ export default class Text {
         ctx.fillStyle = this.color;
         this.textWidth = ctx.measureText(this.word).width;
         ctx.fillText(this.word, this.fitX, this.fitY);
+        ctx.beginPath();
+        ctx.lineWidth = "2";
+        ctx.strokeStyle = "red";
+        ctx.rect(this.fitX, this.fitY, this.textWidth, this.fitFontSize * 1.2);
+        ctx.stroke();
         ctx.restore();
         this.ctx = ctx;
     }

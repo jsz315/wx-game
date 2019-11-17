@@ -6,6 +6,7 @@ import Store from './core/Store.js';
 import InterView from './ui/InterView.js';
 import DataCenter from './core/DataCenter.js';
 import Player from './core/Player.js';
+const TWEEN = require('./libs/Tween.js') 
 // require('./libs/trail-renderer.js')(THREE)
 
 let { pixelRatio, windowHeight, windowWidth } = DataCenter;
@@ -19,6 +20,7 @@ export default class Main {
         console.log(THREE);
         console.log(OIMO);
         console.log(canvas);
+        console.log(TWEEN);
 
         this.canvas = canvas;
 
@@ -154,6 +156,12 @@ export default class Main {
         var x = distX / windowWidth * 8;
         var y = distY / windowWidth * 12;
         DataCenter.gameEvent.emit("move", {x, y});
+
+        // new TWEEN.Tween( controls.target ).to( { x: target[0], y: target[1], z: target[2] }, 400 )
+        //     .easing( TWEEN.Easing.Quadratic.Out )
+        //     .onUpdate( function(){ controls.update(); } )
+        //     //.onComplete( function(){ current = rubrique; isMove = false; } )
+        //     .start();
     }
 
     update() {
@@ -161,6 +169,7 @@ export default class Main {
         this.updaters.forEach(item => {
             item.update();
         })
+        // TWEEN.update();
         this.renderer.clear();
         this.renderer.render(this.scene, this.camera);
         this.renderer.clearDepth();
