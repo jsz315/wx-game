@@ -25,7 +25,7 @@ export default class Main {
         this.canvas = canvas;
 
         this.camera = new THREE.PerspectiveCamera(60, windowWidth / windowHeight, 0.2, 2000);
-        this.camera.position.set(-40, 120, 120);
+        this.camera.position.set(160, 60, 60);
         this.camera.lookAt(new THREE.Vector3());
 
         this.scene = new THREE.Scene();
@@ -54,6 +54,12 @@ export default class Main {
             this.loop.bind(this),
             canvas
         )
+
+        new TWEEN.Tween(this.camera.position).to({x:-40, y:120, z:180}, 3)
+            .easing(TWEEN.Easing.Quadratic.Out)
+            .onUpdate(()=>{this.camera.lookAt(new THREE.Vector3());})
+            .onComplete(function(){})
+            .start();
     }
 
     initLight() {
@@ -196,13 +202,13 @@ export default class Main {
         var cc = this.world.getContact(this.ground.body, this.player.body);
         if(cc){
             if(!cc.close){
-                console.log('collision start');
+                // console.log('collision start');
             }
             // console.log("collision...");
             state.onGround = true;
         }
         else{
-            console.log('collision end');
+            // console.log('collision end');
             state.onGround = false;
         }
             
