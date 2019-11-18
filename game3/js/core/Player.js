@@ -29,7 +29,7 @@ export default class Player{
         if(true){
             param.type = "sphere";
             param.size = [size];
-            this.mesh = new THREE.Mesh(new THREE.SphereGeometry(size), mat);
+            this.mesh = new THREE.Mesh(new THREE.SphereGeometry(size, 32, 32), mat);
         }
         else{
             param.type = "box";
@@ -73,7 +73,7 @@ export default class Player{
     }
 
     destory() {
-        if (this.mesh.position.y < -60) {
+        if (this.mesh.position.y < -90) {
             let x = (0.5 - Math.random()) * 40;
             let y = 20;
             let z = (0.5 - Math.random()) * 40;

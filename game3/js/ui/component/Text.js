@@ -10,6 +10,7 @@ export default class Text {
         this.y = y;
         this.visible = true;
         this.format();
+        this.alpha = 1;
     }
 
     format(textAlign = 'left', color = "#000000", fontSize = 16, fontFamily = "Arial") {
@@ -28,8 +29,18 @@ export default class Text {
     checkClick(x, y) {
         let w = this.textWidth;
         let h = this.fitFontSize * 1.2;
-        console.log(this.textWidth, h);
-        if (x > this.fitX && x < this.fitX + w) {
+        let sx;
+        if(this.textAlign == "left"){
+            sx = this.fitX;
+        }
+        else if(this.textAlign == "center"){
+            sx = this.fitX - this.textWidth / 2;
+        }
+        else if(this.textAlign == "right"){
+            sx = this.fitX - this.textWidth;
+        }
+
+        if (x > sx && x < sx + w) {
             if (y > this.fitY && y < this.fitY + h) {
                 this.callback();
                 return true;
@@ -48,16 +59,27 @@ export default class Text {
         if (!this.visible)
             return
         ctx.save();
+
+        ctx.globalAlpha = this.alpha;
         ctx.font = `${this.fitFontSize}px ${this.fontFamily}`;
         ctx.textAlign = this.textAlign;
         ctx.fillStyle = this.color;
         this.textWidth = ctx.measureText(this.word).width;
+        ctx.textBaseline = 'top';
         ctx.fillText(this.word, this.fitX, this.fitY);
-        ctx.beginPath();
-        ctx.lineWidth = "2";
-        ctx.strokeStyle = "red";
-        ctx.rect(this.fitX, this.fitY, this.textWidth, this.fitFontSize * 1.2);
-        ctx.stroke();
+        // ctx.beginPath();
+        // ctx.lineWidth = "2";
+        // ctx.strokeStyle = "red";
+        // if(this.textAlign == "left"){
+        //     ctx.rect(this.fitX, this.fitY, this.textWidth, this.fitFontSize * 1.2);
+        // }
+        // else if(this.textAlign == "center"){
+        //     ctx.rect(this.fitX - this.textWidth / 2, this.fitY, this.textWidth, this.fitFontSize * 1.2);
+        // }
+        // else if(this.textAlign == "right"){
+        //     ctx.rect(this.fitX - this.textWidth, this.fitY, this.textWidth, this.fitFontSize * 1.2);
+        // }
+        // ctx.stroke();
         ctx.restore();
         this.ctx = ctx;
     }

@@ -5,6 +5,9 @@ let uiHeight = windowHeight * pixelRatio;
 let fitScale = uiWidth / 750;
 
 let listeners = [];
+let state = {
+    onGround: false
+}
 
 function checkClick(x, y) {
     x = x * pixelRatio;
@@ -49,5 +52,6 @@ export default {
     fitScale,
     listeners,
     checkClick,
-    gameEvent
+    gameEvent,
+    state
 }
