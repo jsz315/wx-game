@@ -3,6 +3,7 @@ import * as THREE from '../libs/three/index.js'
 import Text from './component/Text.js'
 import Sprite from './component/Sprite.js'
 import DataCenter from '../core/DataCenter.js';
+const TWEEN = require('../libs/Tween.js');
 
 let { uiWidth, uiHeight, pixelRatio, windowHeight, windowWidth, fitScale } = DataCenter;
 
@@ -88,6 +89,12 @@ export default class InterView {
 		// 	DataCenter.gameEvent.emit("toRight");
 		// })
 
+		helpTxt.alpha = 0;
+		new TWEEN.Tween(helpTxt).to({alpha: 1}, 3)
+            .easing(TWEEN.Easing.Quadratic.Out)
+            .onUpdate(function(){console.log("helpTxt.alpha " + helpTxt.alpha)})
+            .onComplete(function(){})
+            .start();
 	}
 
 	draw() {

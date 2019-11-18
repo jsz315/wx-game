@@ -6,10 +6,10 @@ import Store from './core/Store.js';
 import InterView from './ui/InterView.js';
 import DataCenter from './core/DataCenter.js';
 import Player from './core/Player.js';
-const TWEEN = require('./libs/Tween.js') 
+const TWEEN = require('./libs/Tween.js');
 // require('./libs/trail-renderer.js')(THREE)
 
-let { pixelRatio, windowHeight, windowWidth } = DataCenter;
+let { pixelRatio, windowHeight, windowWidth, state } = DataCenter;
 
 /**
  * 游戏主函数
@@ -46,6 +46,7 @@ export default class Main {
         this.orbitControls.enabled = false;
 
         this.initLight();
+        this.initSkybox();
         this.initViews();
         this.initPlayer();
 
@@ -70,6 +71,22 @@ export default class Main {
         this.renderer.shadowMap.type = THREE.PCFShadowMap;
     }
 
+    initSkybox(){
+        var path = "images/skybox/";
+        var directions  = ["px", "nx", "py", "ny", "pz", "nz"];
+        var format = ".jpg";
+        var skyGeometry = new THREE.BoxGeometry(500, 500, 500);
+        var materialArray = [];
+        for (var i = 0; i < 6; i++){
+            materialArray.push( new THREE.MeshBasicMaterial({
+                map: new THREE.TextureLoader().load(path + directions[i] + format),
+                side: THREE.BackSide
+            }));
+        }
+        var skyBox = new THREE.Mesh(skyGeometry, materialArray);
+        this.scene.add(skyBox);
+    }
+
     initViews() {
         this.world = new OIMO.World({
             info: false,
@@ -82,7 +99,7 @@ export default class Main {
         this.updaters = [];
         this.store = new Store();
 
-        var mat = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
+        var mat = new THREE.MeshStandardMaterial({ color: 0xffffff });
         mat.map = new THREE.TextureLoader().load("images/texture/m1.jpg");
         mat.emissive = new THREE.Color(0, 0, 0);
 
@@ -92,12 +109,13 @@ export default class Main {
         ground.receiveShadow = true;
         ground.position.set(0, -8, 0);
         ground.rotation.x = 10 * Math.PI / 180;
-        new PhysicsView(ground, false, this.world);
+        this.ground = new PhysicsView(ground, false, this.world);
+
 
         let mesh;
         // let types = ["box", "sphere", "cylinder"];
         let types = ["sphere", "sphere", "sphere"];
-        for (let i = 0; i < 12; i++) {
+        for (let i = 0; i < 8; i++) {
             let geo = this.store.getBufferGeometry(types[i % 3]);
             mesh = new THREE.Mesh(geo, this.store.getMaterial());
 
@@ -155,13 +173,9 @@ export default class Main {
         var distY = e.changedTouches[0].clientY - this.touchY;
         var x = distX / windowWidth * 8;
         var y = distY / windowWidth * 12;
-        DataCenter.gameEvent.emit("move", {x, y});
-
-        // new TWEEN.Tween( controls.target ).to( { x: target[0], y: target[1], z: target[2] }, 400 )
-        //     .easing( TWEEN.Easing.Quadratic.Out )
-        //     .onUpdate( function(){ controls.update(); } )
-        //     //.onComplete( function(){ current = rubrique; isMove = false; } )
-        //     .start();
+        if(state.onGround){
+            DataCenter.gameEvent.emit("move", {x, y});
+        }
     }
 
     update() {
@@ -169,12 +183,29 @@ export default class Main {
         this.updaters.forEach(item => {
             item.update();
         })
-        // TWEEN.update();
+        TWEEN.update();
+        this.contact();
         this.renderer.clear();
         this.renderer.render(this.scene, this.camera);
         this.renderer.clearDepth();
         this.interView.draw();
         this.renderer.render(this.interView.scene, this.interView.camera);
+    }
+
+    contact() {
+        var cc = this.world.getContact(this.ground.body, this.player.body);
+        if(cc){
+            if(!cc.close){
+                console.log('collision start');
+            }
+            // console.log("collision...");
+            state.onGround = true;
+        }
+        else{
+            console.log('collision end');
+            state.onGround = false;
+        }
+            
     }
 
     // 实现游戏帧循环

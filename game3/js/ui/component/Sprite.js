@@ -16,6 +16,7 @@ export default class Sprite {
         this.height = height;
         this.x = x;
         this.y = y;
+        this.alpha = 1;
         this.visible = true;
         this.loaded = false;
     }
@@ -49,7 +50,7 @@ export default class Sprite {
             return
         ctx.save();
 
-
+        ctx.globalAlpha = this.alpha;
         ctx.drawImage(
             this.img, //图片源y
             0, //图片裁剪x坐标
