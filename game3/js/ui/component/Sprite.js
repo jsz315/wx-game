@@ -19,6 +19,7 @@ export default class Sprite {
         this.alpha = 1;
         this.visible = true;
         this.loaded = false;
+        this.clip = 100;
     }
 
     onClick(callback) {
@@ -27,7 +28,7 @@ export default class Sprite {
     }
 
     checkClick(x, y) {
-        if (x > this.fitX && x < this.fitX + this.fitWidth) {
+        if (x > this.fitX && x < this.fitX + this.fitWidth * this.clip / 100) {
             if (y > this.fitY && y < this.fitY + this.fitHeight) {
                 this.callback();
                 return true;
@@ -49,6 +50,12 @@ export default class Sprite {
         if (!this.visible || !this.loaded)
             return
         ctx.save();
+
+        // ctx.fillStyle="#ff9900";
+        ctx.beginPath();
+        ctx.rect(this.fitX, this.fitY, this.fitWidth * this.clip / 100, this.fitHeight);
+        // ctx.fill();
+        ctx.clip();
 
         ctx.globalAlpha = this.alpha;
         ctx.drawImage(
