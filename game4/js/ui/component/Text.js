@@ -11,6 +11,7 @@ export default class Text {
         this.visible = true;
         this.format();
         this.alpha = 1;
+        this.parent = null;
     }
 
     format(textAlign = 'left', color = "#000000", fontSize = 16, fontFamily = "Arial") {
@@ -26,7 +27,9 @@ export default class Text {
         DataCenter.listeners.push(this);
     }
 
-    checkClick(x, y) {
+    checkClick(ox, oy) {
+        let {x, y} = this.toGlobal(ox, oy);
+
         let w = this.textWidth;
         let h = this.fitFontSize * 1.2;
         let sx;
@@ -49,6 +52,18 @@ export default class Text {
         return false;
     }
 
+    toGlobal(x, y){
+        let parent = this.parent;
+        console.log("世界: ", x, y);
+        while(parent){
+            x -= parent.x;
+            y -= parent.y;
+            parent = parent.parent;
+        }
+        console.log("本地: ", x, y);
+        return {x, y};
+    }
+
     fitSize() {
         this.fitX = this.x * fitScale;
         this.fitY = this.y * fitScale;
@@ -57,7 +72,7 @@ export default class Text {
 
     draw(ctx) {
         if (!this.visible)
-            return
+            return;
         ctx.save();
 
         ctx.globalAlpha = this.alpha;
@@ -67,6 +82,8 @@ export default class Text {
         this.textWidth = ctx.measureText(this.word).width;
         ctx.textBaseline = 'top';
         ctx.fillText(this.word, this.fitX, this.fitY);
+
+
         // ctx.beginPath();
         // ctx.lineWidth = "2";
         // ctx.strokeStyle = "red";
@@ -80,6 +97,8 @@ export default class Text {
         //     ctx.rect(this.fitX - this.textWidth, this.fitY, this.textWidth, this.fitFontSize * 1.2);
         // }
         // ctx.stroke();
+
+
         ctx.restore();
         this.ctx = ctx;
     }

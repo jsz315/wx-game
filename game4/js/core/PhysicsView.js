@@ -44,7 +44,7 @@ export default class PhysicsView {
         this.mesh.position.copy(this.body.getPosition());
         this.mesh.quaternion.copy(this.body.getQuaternion());
         // this.body.updateMesh();
-        this.destory();
+        // this.destory();
     }
 
     destory() {

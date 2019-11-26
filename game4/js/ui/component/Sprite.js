@@ -20,6 +20,7 @@ export default class Sprite {
         this.visible = true;
         this.loaded = false;
         this.clip = 100;
+        this.parent = null;
     }
 
     onClick(callback) {
@@ -27,7 +28,8 @@ export default class Sprite {
         DataCenter.listeners.push(this);
     }
 
-    checkClick(x, y) {
+    checkClick(ox, oy) {
+        let {x, y} = this.toGlobal(ox, oy);
         if (x > this.fitX && x < this.fitX + this.fitWidth * this.clip / 100) {
             if (y > this.fitY && y < this.fitY + this.fitHeight) {
                 this.callback();
@@ -35,6 +37,18 @@ export default class Sprite {
             }
         }
         return false;
+    }
+
+    toGlobal(x, y){
+        let parent = this.parent;
+        console.log("世界: ", x, y);
+        while(parent){
+            x -= parent.x;
+            y -= parent.y;
+            parent = parent.parent;
+        }
+        console.log("本地: ", x, y);
+        return {x, y};
     }
 
     fitSize() {
@@ -48,7 +62,7 @@ export default class Sprite {
 
     draw(ctx) {
         if (!this.visible || !this.loaded)
-            return
+            return;
         ctx.save();
 
         // ctx.fillStyle="#ff9900";

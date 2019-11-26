@@ -10,13 +10,13 @@ export default class FollowCamera{
     update(){
         let p = this.target.position;
         
-        if(p.z < 10){
+        if(p.z < 20){
             // this.camera.position.set(p.x, p.y + 28, z);
-            this.camera.lookAt(p);
+            this.camera.lookAt(new THREE.Vector3());
         }
         else{
             let z = p.z + 32;
-            this.camera.position.set(p.x, p.y + 28, z);
+            this.camera.position.set(p.x, p.y + 20, z);
             this.camera.lookAt(p);
         }
         

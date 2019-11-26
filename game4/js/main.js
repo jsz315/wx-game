@@ -49,8 +49,23 @@ export default class Main {
 
         this.gameState = 0;//0停止，1进行中
 
+        this.world = new OIMO.World({
+            info: false,
+            timestep: 1 / 60,
+            iterations: 8, 
+            broadphase: 2, // 1: brute force, 2: sweep & prune, 3: volume tree
+            worldscale: 16
+        });
+
+        this.updaters = [];
+        this.store = new Store();
+
+        this.meshes = [];
+        this.itemViews = [];
+
         this.initLight();
         this.initSkybox();
+        this.initGround();
         this.initViews();
         this.initPlayer();
 
@@ -100,6 +115,7 @@ export default class Main {
     reset(){
         let row = 0;
         let t = 0;
+        let distance = 7;
         for (let i = 0; i < this.itemViews.length; i++) {
             if(i <= 0){
                 row = 0;
@@ -118,30 +134,19 @@ export default class Main {
                 t = 6;
             }
 
-            let x = (i - t) * 6 - 6 / 2 * row;
-            let y = 6;
-            let z = row * -6;
+            let x = (i - t) * distance - distance / 2 * row;
+            let y = distance;
+            let z = row * -distance;
             this.itemViews[i].setPositon(x, y, z);
         }
 
-        this.player.setPositon(0, 4, 70);
+        this.player.setPositon(0, 4, 80);
         this.interView.showScore(0);
     }
 
-    initViews() {
-        this.world = new OIMO.World({
-            info: false,
-            timestep: 1 / 60,
-            iterations: 8, 
-            broadphase: 2, // 1: brute force, 2: sweep & prune, 3: volume tree
-            worldscale: 16
-        });
-
-        this.updaters = [];
-        this.store = new Store();
-
+    initGround(){
         var mat = new THREE.MeshStandardMaterial({ color: 0xffffff });
-        mat.map = new THREE.TextureLoader().load("images/texture/m1.jpg");
+        mat.map = new THREE.TextureLoader().load("images/texture/m4.jpg");
         mat.map.wrapS = mat.map.wrapT = THREE.RepeatWrapping;
         mat.map.repeat.set(10, 10);
         mat.emissive = new THREE.Color(0, 0, 0);
@@ -154,14 +159,27 @@ export default class Main {
         // ground.rotation.x = 10 * Math.PI / 180;
         this.ground = new PhysicsView(ground, false, this.world);
 
-        this.meshes = [];
-        this.itemViews = [];
+        let leftBar = new THREE.Mesh(new THREE.BoxGeometry(2, 24, 200), mat);
+        this.scene.add(leftBar);
+        leftBar.castShadow = true;
+        leftBar.receiveShadow = true;
+        leftBar.position.set(-20, -8, 0);
+        // leftBar.rotation.x = 10 * Math.PI / 180;
+        this.leftBar = new PhysicsView(leftBar, false, this.world);
 
+        let rightBar = new THREE.Mesh(new THREE.BoxGeometry(2, 24, 200), mat);
+        this.scene.add(rightBar);
+        rightBar.castShadow = true;
+        rightBar.receiveShadow = true;
+        rightBar.position.set(20, -8, 0);
+        // rightBar.rotation.x = 10 * Math.PI / 180;
+        this.rightBar = new PhysicsView(rightBar, false, this.world);
+    }
+
+    initViews() {
         let mesh;
         // let types = ["box", "sphere", "cylinder"];
         let types = ["cylinder", "cylinder", "cylinder"];
-        let row = 0;
-        let t = 0;
         for (let i = 0; i < 10; i++) {
             let geo = this.store.getBufferGeometry(types[i % 3]);
             mesh = new THREE.Mesh(geo, this.store.getMaterial());
@@ -207,19 +225,19 @@ export default class Main {
             }
         })
         if(sleeping < this.itemViews.length){
-            console.log("运动中");
+            // console.log("运动中");
             if(this.gameState == 1){
                 return;
             }
         }
-        console.log("静止");
+        // console.log("静止");
         let rta = 180 / Math.PI;
         let total = 0;
         this.meshes.forEach(item => {
             var x = Math.floor(item.rotation.x * rta);
             var y = Math.floor(item.rotation.y * rta);
             var z = Math.floor(item.rotation.z * rta);
-            if(Math.abs(x) < 4){
+            if(Math.abs(x) < 10){
 
             }
             else{
@@ -253,7 +271,7 @@ export default class Main {
     }
 
     onTouchStart(e) {
-        var hit = DataCenter.checkClick(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+        DataCenter.checkClick(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
         // this.orbitControls.enabled = !hit;
         this.touchX = e.changedTouches[0].clientX;
         this.touchY = e.changedTouches[0].clientY;
@@ -262,7 +280,7 @@ export default class Main {
     onTouchEnd(e){
         var distX = e.changedTouches[0].clientX - this.touchX;
         var distY = e.changedTouches[0].clientY - this.touchY;
-        var x = distX / windowWidth * 4;
+        var x = distX / windowWidth * 6;
         var y = distY / windowWidth * 8;
         if(state.onGround){
             DataCenter.gameEvent.emit("move", {x, y});
