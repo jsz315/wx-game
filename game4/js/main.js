@@ -52,9 +52,9 @@ export default class Main {
         this.world = new OIMO.World({
             info: false,
             timestep: 1 / 60,
-            iterations: 8, 
+            iterations: 2, 
             broadphase: 2, // 1: brute force, 2: sweep & prune, 3: volume tree
-            worldscale: 16
+            worldscale: 20
         });
 
         this.updaters = [];
@@ -82,9 +82,10 @@ export default class Main {
     }
 
     initLight() {
-        this.scene.add(new THREE.AmbientLight(0x3D4143));
-        var light = new THREE.DirectionalLight(0xffffff, 1);
-        light.position.set(300, 1000, 500);
+        this.scene.add(new THREE.AmbientLight(0xa4a4a4));
+
+        var light = new THREE.DirectionalLight(0xffffff, 0.72);
+        light.position.set(100, 1000, -100);
         light.target.position.set(0, 0, 0);
         light.castShadow = true;
         var n = 300;
@@ -135,23 +136,24 @@ export default class Main {
             }
 
             let x = (i - t) * distance - distance / 2 * row;
-            let y = distance;
+            let y = 2;
             let z = row * -distance;
             this.itemViews[i].setPositon(x, y, z);
         }
 
-        this.player.setPositon(0, 4, 80);
+        this.player.setPositon(0, 4, 160);
         this.interView.showScore(0);
+        this.followCamera.running = true;
     }
 
     initGround(){
         var mat = new THREE.MeshStandardMaterial({ color: 0xffffff });
         mat.map = new THREE.TextureLoader().load("images/texture/m4.jpg");
         mat.map.wrapS = mat.map.wrapT = THREE.RepeatWrapping;
-        mat.map.repeat.set(10, 10);
+        mat.map.repeat.set(10, 20);
         mat.emissive = new THREE.Color(0, 0, 0);
 
-        let ground = new THREE.Mesh(new THREE.BoxGeometry(200, 8, 200), mat);
+        let ground = new THREE.Mesh(new THREE.BoxGeometry(200, 8, 400), mat);
         this.scene.add(ground);
         ground.castShadow = true;
         ground.receiveShadow = true;
@@ -159,7 +161,7 @@ export default class Main {
         // ground.rotation.x = 10 * Math.PI / 180;
         this.ground = new PhysicsView(ground, false, this.world);
 
-        let leftBar = new THREE.Mesh(new THREE.BoxGeometry(2, 24, 200), mat);
+        let leftBar = new THREE.Mesh(new THREE.BoxGeometry(2, 24, 400), mat);
         this.scene.add(leftBar);
         leftBar.castShadow = true;
         leftBar.receiveShadow = true;
@@ -167,7 +169,7 @@ export default class Main {
         // leftBar.rotation.x = 10 * Math.PI / 180;
         this.leftBar = new PhysicsView(leftBar, false, this.world);
 
-        let rightBar = new THREE.Mesh(new THREE.BoxGeometry(2, 24, 200), mat);
+        let rightBar = new THREE.Mesh(new THREE.BoxGeometry(2, 24, 400), mat);
         this.scene.add(rightBar);
         rightBar.castShadow = true;
         rightBar.receiveShadow = true;
@@ -186,9 +188,9 @@ export default class Main {
             mesh.castShadow = true;
             mesh.receiveShadow = true;
             this.scene.add(mesh);
+            mesh.position.set(0, 2, i *10);
             let physicsView = new PhysicsView(mesh, true, this.world);
             this.updaters.push(physicsView);
-
             this.meshes.push(mesh);
             this.itemViews.push(physicsView);
         }
@@ -205,9 +207,12 @@ export default class Main {
             // this.orbitControls.enabled = !this.orbitControls.enabled;
         })
 
-        DataCenter.gameEvent.on("over", () => {
-            this.gameState = 0;
-            this.interView.showGameOver();
+        DataCenter.gameEvent.on("gameOver", () => {
+            if(this.gameState){
+                this.gameState = 0;
+                let score = this.checkScore();
+                this.interView.showGameOver(score);
+            }
         })
 
         DataCenter.gameEvent.on("gameStart", () => {
@@ -225,7 +230,6 @@ export default class Main {
             }
         })
         if(sleeping < this.itemViews.length){
-            // console.log("运动中");
             if(this.gameState == 1){
                 return;
             }
@@ -244,7 +248,8 @@ export default class Main {
                 total++;
             }
         })
-        this.interView.showScore(total);
+        return total;
+        // this.interView.showScore(total);
     }
 
     initPlayer(){
@@ -266,8 +271,8 @@ export default class Main {
         // var trailLength = 150;
         // trail.initialize( trailMaterial, trailLength, false, 0, trailHeadGeometry, this.player.mesh );
 
-        var followCamera = new FollowCamera(this.camera, this.player.mesh);
-        this.updaters.push(followCamera); 
+        this.followCamera = new FollowCamera(this.camera, this.player.mesh);
+        this.updaters.push(this.followCamera); 
     }
 
     onTouchStart(e) {
@@ -280,10 +285,13 @@ export default class Main {
     onTouchEnd(e){
         var distX = e.changedTouches[0].clientX - this.touchX;
         var distY = e.changedTouches[0].clientY - this.touchY;
-        var x = distX / windowWidth * 6;
-        var y = distY / windowWidth * 8;
+        var x = distX / windowWidth * 10;
+        var y = distY / windowWidth * 10;
         if(state.onGround){
             DataCenter.gameEvent.emit("move", {x, y});
+            setTimeout(()=>{
+                DataCenter.gameEvent.emit("gameOver");
+            }, 5000);
         }
     }
 
@@ -294,7 +302,7 @@ export default class Main {
                 item.update();
             })
             this.contact();
-            this.checkScore();
+            // this.checkScore();
         }
         
         TWEEN.update();

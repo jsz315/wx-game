@@ -12,7 +12,7 @@ export default class Store {
             let size = 1.5;
             this.sphereGeos.push(new THREE.SphereGeometry(size, 10, 10));
             this.boxGeos.push(new THREE.BoxGeometry(size, size, size));
-            this.cylinderGeos.push(new THREE.CylinderGeometry(size, size, size * 4));
+            this.cylinderGeos.push(new THREE.CylinderGeometry(size, size, size * 3.6));
 
             let color = new THREE.Color(0xffffff);
             let mat = new THREE.MeshStandardMaterial({ color });

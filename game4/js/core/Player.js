@@ -19,7 +19,7 @@ export default class Player{
             pos: [0, 0, 0],
             rot: [0, 0, 0],
             move: true,
-            density: 8,
+            density: 20,
             friction: 0.72,
             restitution: 0.1,
             belongsTo: 1,
@@ -57,7 +57,7 @@ export default class Player{
     setPositon(x, y, z){
         this.body.resetPosition(x, y, z);
         this.body.resetRotation(0, 0, 0);
-        this.update();
+        // this.update();
     }
 
     move(n){
@@ -85,7 +85,8 @@ export default class Player{
             // let y = 20;
             // let z = (0.5 - Math.random()) * 40;
             // this.body.resetPosition(x, y, z);
-            DataCenter.gameEvent.emit("over");
+            // console.log("send game over");
+            // DataCenter.gameEvent.emit("gameOver");
         }
     }
 }

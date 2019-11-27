@@ -1,4 +1,5 @@
 import DataCenter from '../../core/DataCenter.js';
+import Tooler from '../tooler.js';
 let { fitScale } = DataCenter;
 
 
@@ -21,15 +22,20 @@ export default class Sprite {
         this.loaded = false;
         this.clip = 100;
         this.parent = null;
+        this.name = "Sprite";
     }
 
     onClick(callback) {
         this.callback = callback;
-        DataCenter.listeners.push(this);
+        DataCenter.onClick(this);
     }
 
     checkClick(ox, oy) {
-        let {x, y} = this.toGlobal(ox, oy);
+        if(!Tooler.globalVisible(this)){
+            // console.log(this.name + " no visible");
+            return false;
+        }
+        let {x, y} = Tooler.globalToLocal(ox, oy, this);
         if (x > this.fitX && x < this.fitX + this.fitWidth * this.clip / 100) {
             if (y > this.fitY && y < this.fitY + this.fitHeight) {
                 this.callback();
@@ -37,18 +43,6 @@ export default class Sprite {
             }
         }
         return false;
-    }
-
-    toGlobal(x, y){
-        let parent = this.parent;
-        console.log("世界: ", x, y);
-        while(parent){
-            x -= parent.x;
-            y -= parent.y;
-            parent = parent.parent;
-        }
-        console.log("本地: ", x, y);
-        return {x, y};
     }
 
     fitSize() {
@@ -71,7 +65,7 @@ export default class Sprite {
         // ctx.fill();
         ctx.clip();
 
-        ctx.globalAlpha = this.alpha;
+        ctx.globalAlpha = Tooler.globalAlpha(this);
         ctx.drawImage(
             this.img, //图片源y
             0, //图片裁剪x坐标

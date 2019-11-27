@@ -20,6 +20,10 @@ function checkClick(x, y) {
     return false;
 }
 
+function onClick(obj){
+    listeners.push(obj);
+}
+
 const gameEvent = {
     handles: {},
     on: function (eventName, callback) {
@@ -52,6 +56,7 @@ export default {
     fitScale,
     listeners,
     checkClick,
+    onClick,    
     gameEvent,
     state
 }

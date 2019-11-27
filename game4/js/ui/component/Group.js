@@ -1,3 +1,4 @@
+import Tooler from '../tooler.js';
 
 export default class Group{
 
@@ -8,6 +9,7 @@ export default class Group{
         this.alpha = 1;
         this.visible = true;
         this.parent = null;
+        this.name = "Group";
     }
 
     add(view){
@@ -31,7 +33,7 @@ export default class Group{
             return;
         ctx.save();
         ctx.translate(this.x, this.y);
-        ctx.globalAlpha = this.alpha;
+        ctx.globalAlpha = Tooler.globalAlpha(this);
         this.children.forEach(view => {
             view.draw(ctx);
         })

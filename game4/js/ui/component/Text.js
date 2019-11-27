@@ -1,5 +1,5 @@
 import DataCenter from '../../core/DataCenter.js';
-
+import Tooler from '../tooler.js';
 let { fitScale } = DataCenter;
 
 export default class Text {
@@ -12,6 +12,7 @@ export default class Text {
         this.format();
         this.alpha = 1;
         this.parent = null;
+        this.name = "Text";
     }
 
     format(textAlign = 'left', color = "#000000", fontSize = 16, fontFamily = "Arial") {
@@ -24,11 +25,15 @@ export default class Text {
 
     onClick(callback) {
         this.callback = callback;
-        DataCenter.listeners.push(this);
+        DataCenter.onClick(this);
     }
 
     checkClick(ox, oy) {
-        let {x, y} = this.toGlobal(ox, oy);
+        if(!Tooler.globalVisible(this)){
+            // console.log(this.name + " no visible");
+            return false;
+        }
+        let {x, y} = Tooler.globalToLocal(ox, oy, this);
 
         let w = this.textWidth;
         let h = this.fitFontSize * 1.2;
@@ -52,18 +57,6 @@ export default class Text {
         return false;
     }
 
-    toGlobal(x, y){
-        let parent = this.parent;
-        console.log("世界: ", x, y);
-        while(parent){
-            x -= parent.x;
-            y -= parent.y;
-            parent = parent.parent;
-        }
-        console.log("本地: ", x, y);
-        return {x, y};
-    }
-
     fitSize() {
         this.fitX = this.x * fitScale;
         this.fitY = this.y * fitScale;
@@ -75,7 +68,7 @@ export default class Text {
             return;
         ctx.save();
 
-        ctx.globalAlpha = this.alpha;
+        ctx.globalAlpha = Tooler.globalAlpha(this);
         ctx.font = `${this.fitFontSize}px ${this.fontFamily}`;
         ctx.textAlign = this.textAlign;
         ctx.fillStyle = this.color;

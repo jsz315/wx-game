@@ -11,9 +11,9 @@ export default class PhysicsView {
             pos: [mesh.position.x, mesh.position.y, mesh.position.z],
             rot: [mesh.rotation.x * TORAN, mesh.rotation.y * TORAN, mesh.rotation.z * TORAN],
             move: move,
-            density: 1.6,
-            friction: 0.8,
-            restitution: 0.01,
+            density: 1,
+            friction: 0.72,
+            restitution: 0,
             belongsTo: 1,
             collidesWith: 0xffffffff
         }
@@ -35,9 +35,10 @@ export default class PhysicsView {
     }
 
     setPositon(x, y, z){
+        this.body.sleep();
         this.body.resetPosition(x, y, z);
         this.body.resetRotation(0, 0, 0);
-        this.update();
+        // this.update();
     }
 
     update() {
