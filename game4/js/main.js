@@ -12,6 +12,7 @@ const TWEEN = require('./libs/Tween.js');
 // require('./libs/trail-renderer.js')(THREE)
 
 let { pixelRatio, windowHeight, windowWidth, state } = DataCenter;
+let worker = wx.createWorker('workers/request/index.js') 
 
 /**
  * 游戏主函数
@@ -24,6 +25,18 @@ export default class Main {
         console.log(canvas);
         console.log(TWEEN);
 
+        console.log("worker =====");
+        console.log(worker);
+
+        worker.onMessage(function(res){
+            console.log("game receive");
+            console.log(res);
+        })
+
+        worker.postMessage({
+            msg: 'hello worker js'
+        })
+        
         this.canvas = canvas;
 
         this.camera = new THREE.PerspectiveCamera(60, windowWidth / windowHeight, 0.2, 2000);
