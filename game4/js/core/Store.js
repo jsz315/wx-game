@@ -39,7 +39,7 @@ export default class Store {
             geo = this.getCylinderBufferGeometry();
         }
         return geo;
-    }
+    }n
 
     getCylinderBufferGeometry() {
         let n = Math.floor(Math.random() * this.cylinderGeos.length);

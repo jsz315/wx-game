@@ -1,68 +1,84 @@
 
 import * as THREE from '../libs/three/index.js'
-const OIMO = require('../libs/oimo/index.js')
-import DataCenter from '../core/DataCenter.js';
+// const OIMO = require('../libs/oimo/index.js')
+import DataCenter from "./DataCenter";
+
+let { pixelRatio, windowHeight, windowWidth, state, worker } = DataCenter;
+const TORAN = 180 / Math.PI;
 
 export default class Player{
 
     constructor(world){
         this.world = world;
-        let size = 4;
+        let size = 3;
         let color = new THREE.Color(0xffffff);
         let mat = new THREE.MeshStandardMaterial({ color });
         mat.map = new THREE.TextureLoader().load("images/texture/m3.jpg");
         mat.emissive = new THREE.Color(0, 0, 0);
-        mat.metalness = 0.3;
-        mat.roughness = 0.3;
+        mat.metalness = 0.1;
+        mat.roughness = 0.4;
 
-        let param = {
-            pos: [0, 0, 0],
-            rot: [0, 0, 0],
-            move: true,
-            density: 20,
-            friction: 0.72,
-            restitution: 0.1,
-            belongsTo: 1,
-            collidesWith: 0xffffffff
-        }
+        // let param = {
+        //     pos: [0, 0, 0],
+        //     rot: [0, 0, 0],
+        //     move: true,
+        //     density: 20,
+        //     friction: 0.72,
+        //     restitution: 0.1,
+        //     belongsTo: 1,
+        //     collidesWith: 0xffffffff
+        // }
 
-        if(true){
-            param.type = "sphere";
-            param.size = [size];
-            this.mesh = new THREE.Mesh(new THREE.SphereGeometry(size, 32, 32), mat);
-        }
-        else{
-            param.type = "box";
-            param.size = [size, size, size];
-            this.mesh = new THREE.Mesh(new THREE.BoxGeometry(size, size, size), mat);
-        }
+        // if(true){
+        //     param.type = "sphere";
+        //     param.size = [size];
+        //     this.mesh = new THREE.Mesh(new THREE.SphereGeometry(size, 32, 32), mat);
+        // }
+        // else{
+        //     param.type = "box";
+        //     param.size = [size, size, size];
+        //     this.mesh = new THREE.Mesh(new THREE.BoxGeometry(size, size, size), mat);
+        // }
+        // this.body = world.add(param);
         
+        this.mesh = new THREE.Mesh(new THREE.SphereGeometry(size, 32, 32), mat);
         this.mesh.castShadow = true;
         this.mesh.receiveShadow = true;
 
-        this.body = world.add(param);
+        worker.postMessage({
+            type: 5,
+            size: size
+        })
 
         DataCenter.gameEvent.on("toLeft", ()=>{this.moveLeft()});
         DataCenter.gameEvent.on("toRight", ()=>{this.moveRight()});
         DataCenter.gameEvent.on("move", (n)=>{this.move(n)});
     }
 
+    step(item){
+        this.mesh.position.copy(item.position);
+        this.mesh.quaternion.copy(item.quaternion);
+    }
+
     update() {
-        this.mesh.position.copy(this.body.getPosition());
-        this.mesh.quaternion.copy(this.body.getQuaternion());
-        // this.body.updateMesh();
-        this.destory();
+        // this.mesh.position.copy(this.body.getPosition());
+        // this.mesh.quaternion.copy(this.body.getQuaternion());
+        // this.destory();
     }
 
     setPositon(x, y, z){
-        this.body.resetPosition(x, y, z);
-        this.body.resetRotation(0, 0, 0);
+        // this.body.resetPosition(x, y, z);
+        // this.body.resetRotation(0, 0, 0);
         // this.update();
     }
 
     move(n){
         // console.log("move", n);
-        this.body.linearVelocity.set(n.x, 0, n.y);
+        // this.body.linearVelocity.set(n.x, 0, n.y);
+        worker.postMessage({
+            type: 7,
+            position: [n.x, 0, n.y]
+        })
     }
 
     moveLeft(){

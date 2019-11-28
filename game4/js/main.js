@@ -1,6 +1,6 @@
 import * as THREE from './libs/three/index.js'
 let OrbitControls = require('../miniprogram_npm/three-orbit-controls/index.js')(THREE)
-const OIMO = require('./libs/oimo/index.js')
+// const OIMO = require('./libs/oimo/index.js')
 import PhysicsView from './core/PhysicsView.js';
 import Store from './core/Store.js';
 import InterView from './ui/InterView.js';
@@ -11,8 +11,8 @@ import Tooler from './core/Tooler.js';
 const TWEEN = require('./libs/Tween.js');
 // require('./libs/trail-renderer.js')(THREE)
 
-let { pixelRatio, windowHeight, windowWidth, state } = DataCenter;
-let worker = wx.createWorker('workers/request/index.js') 
+let { pixelRatio, windowHeight, windowWidth, state, worker } = DataCenter;
+// let worker = wx.createWorker('workers/request/index.js') 
 
 /**
  * 游戏主函数
@@ -21,22 +21,13 @@ export default class Main {
 
     constructor(canvas) {
         console.log(THREE);
-        console.log(OIMO);
+        // console.log(OIMO);
         console.log(canvas);
         console.log(TWEEN);
 
         console.log("worker =====");
         console.log(worker);
 
-        worker.onMessage(function(res){
-            console.log("game receive");
-            console.log(res);
-        })
-
-        worker.postMessage({
-            msg: 'hello worker js'
-        })
-        
         this.canvas = canvas;
 
         this.camera = new THREE.PerspectiveCamera(60, windowWidth / windowHeight, 0.2, 2000);
@@ -62,13 +53,14 @@ export default class Main {
 
         this.gameState = 0;//0停止，1进行中
 
-        this.world = new OIMO.World({
-            info: false,
-            timestep: 1 / 60,
-            iterations: 2, 
-            broadphase: 2, // 1: brute force, 2: sweep & prune, 3: volume tree
-            worldscale: 20
-        });
+        this.world = 100;
+        // this.world = new OIMO.World({
+        //     info: false,
+        //     timestep: 1 / 60,
+        //     iterations: 2, 
+        //     broadphase: 2, // 1: brute force, 2: sweep & prune, 3: volume tree
+        //     worldscale: 20
+        // });
 
         this.updaters = [];
         this.store = new Store();
@@ -76,6 +68,9 @@ export default class Main {
         this.meshes = [];
         this.itemViews = [];
 
+        this.physicsList = [];
+
+        this.initWorker();
         this.initLight();
         this.initSkybox();
         this.initGround();
@@ -92,6 +87,30 @@ export default class Main {
         //     .onUpdate(()=>{this.camera.lookAt(new THREE.Vector3());})
         //     .onComplete(function(){})
         //     .start();
+    }
+
+    initWorker(){
+
+        worker.onMessage((res) => {
+            switch(res.type){
+                case 0:
+                    this.updateWorld(res.list, res.player);
+                    break;
+                default:
+                    break;
+            }
+        })
+
+        worker.postMessage({
+            type: 0
+        })
+    }
+
+    updateWorld(list, player){
+        list.forEach((item, index) => {
+            this.physicsList[index].step(item);
+        })
+        this.player.step(player);
     }
 
     initLight() {
@@ -151,10 +170,26 @@ export default class Main {
             let x = (i - t) * distance - distance / 2 * row;
             let y = 2;
             let z = row * -distance;
+            if(i > 10){
+                x = (0.5 - Math.random()) * 30;
+                z = -60 - (0.5 - Math.random()) * 200;
+            }
             this.itemViews[i].setPositon(x, y, z);
+
+            let nid = this.physicsList.findIndex(item => item == this.itemViews[i]);
+            worker.postMessage({
+                type: 3,
+                index: nid,
+                position: [x, y, z]
+            })
         }
 
-        this.player.setPositon(0, 4, 160);
+        // this.player.setPositon(0, 4, 160);
+        worker.postMessage({
+            type: 6,
+            position: [0, 4, 160]
+        })
+
         this.interView.showScore(0);
         this.followCamera.running = true;
     }
@@ -173,6 +208,7 @@ export default class Main {
         ground.position.set(0, -8, 0);
         // ground.rotation.x = 10 * Math.PI / 180;
         this.ground = new PhysicsView(ground, false, this.world);
+        this.physicsList.push(this.ground);
 
         let leftBar = new THREE.Mesh(new THREE.BoxGeometry(2, 24, 400), mat);
         this.scene.add(leftBar);
@@ -181,6 +217,7 @@ export default class Main {
         leftBar.position.set(-20, -8, 0);
         // leftBar.rotation.x = 10 * Math.PI / 180;
         this.leftBar = new PhysicsView(leftBar, false, this.world);
+        this.physicsList.push(this.leftBar);
 
         let rightBar = new THREE.Mesh(new THREE.BoxGeometry(2, 24, 400), mat);
         this.scene.add(rightBar);
@@ -189,20 +226,22 @@ export default class Main {
         rightBar.position.set(20, -8, 0);
         // rightBar.rotation.x = 10 * Math.PI / 180;
         this.rightBar = new PhysicsView(rightBar, false, this.world);
+        this.physicsList.push(this.rightBar);
     }
 
     initViews() {
         let mesh;
         // let types = ["box", "sphere", "cylinder"];
         let types = ["cylinder", "cylinder", "cylinder"];
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 80; i++) {
             let geo = this.store.getBufferGeometry(types[i % 3]);
             mesh = new THREE.Mesh(geo, this.store.getMaterial());
             mesh.castShadow = true;
             mesh.receiveShadow = true;
             this.scene.add(mesh);
-            mesh.position.set(0, 2, i *10);
+            mesh.position.set(0, 2, i * 10);
             let physicsView = new PhysicsView(mesh, true, this.world);
+            this.physicsList.push(physicsView);
             this.updaters.push(physicsView);
             this.meshes.push(mesh);
             this.itemViews.push(physicsView);
@@ -221,32 +260,39 @@ export default class Main {
         })
 
         DataCenter.gameEvent.on("gameOver", () => {
+            console.log("on game over");
             if(this.gameState){
                 this.gameState = 0;
                 let score = this.checkScore();
                 this.interView.showGameOver(score);
+                worker.postMessage({
+                    type: 2
+                })
             }
         })
 
         DataCenter.gameEvent.on("gameStart", () => {
             this.reset();
             this.gameState = 1;
+            worker.postMessage({
+                type: 1
+            })
         })
 
     }
 
     checkScore(){
-        let sleeping = 0;
-        this.itemViews.forEach(item => {
-            if(item.body.sleeping){
-                sleeping++;
-            }
-        })
-        if(sleeping < this.itemViews.length){
-            if(this.gameState == 1){
-                return;
-            }
-        }
+        // let sleeping = 0;
+        // this.itemViews.forEach(item => {
+        //     if(item.body.sleeping){
+        //         sleeping++;
+        //     }
+        // })
+        // if(sleeping < this.itemViews.length){
+        //     if(this.gameState == 1){
+        //         return;
+        //     }
+        // }
         // console.log("静止");
         let rta = 180 / Math.PI;
         let total = 0;
@@ -289,7 +335,7 @@ export default class Main {
     }
 
     onTouchStart(e) {
-        DataCenter.checkClick(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+        // DataCenter.checkClick(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
         // this.orbitControls.enabled = !hit;
         this.touchX = e.changedTouches[0].clientX;
         this.touchY = e.changedTouches[0].clientY;
@@ -300,28 +346,29 @@ export default class Main {
         var distY = e.changedTouches[0].clientY - this.touchY;
         var x = distX / windowWidth * 10;
         var y = distY / windowWidth * 10;
-        if(state.onGround){
+        if(this.gameState == 1){
             DataCenter.gameEvent.emit("move", {x, y});
             setTimeout(()=>{
                 DataCenter.gameEvent.emit("gameOver");
             }, 5000);
         }
+        DataCenter.checkClick(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
     }
 
     update() {
         if(this.gameState){
-            this.world.step();
+            // this.world.step();
             this.updaters.forEach(item => {
                 item.update();
             })
-            this.contact();
+            // this.contact();
             // this.checkScore();
         }
         
-        TWEEN.update();
-        this.renderer.clear();
+        // TWEEN.update();
+        // this.renderer.clear();
         this.renderer.render(this.scene, this.camera);
-        this.renderer.clearDepth();
+        // this.renderer.clearDepth();
         this.interView.draw();
         this.renderer.render(this.interView.scene, this.interView.camera);
     }

@@ -1,49 +1,70 @@
+import DataCenter from "./DataCenter";
+
+let { pixelRatio, windowHeight, windowWidth, state, worker } = DataCenter;
 const TORAN = 180 / Math.PI;
 
 export default class PhysicsView {
     constructor(mesh, move, world) {
         this.mesh = mesh;
-        this.world = world;
-        let type = mesh.geometry.type;
-        let parameters = mesh.geometry.parameters;
 
-        let param = {
-            pos: [mesh.position.x, mesh.position.y, mesh.position.z],
-            rot: [mesh.rotation.x * TORAN, mesh.rotation.y * TORAN, mesh.rotation.z * TORAN],
-            move: move,
-            density: 1,
-            friction: 0.72,
-            restitution: 0,
-            belongsTo: 1,
-            collidesWith: 0xffffffff
-        }
+        worker.postMessage({
+            type: 4,
+            data: {
+                move: move,
+                type: mesh.geometry.type,
+                parameters: mesh.geometry.parameters,
+                position: mesh.position,
+                rotation: mesh.rotation
+            }
+            
+        })
 
-        if (type == "CylinderGeometry") {
-            param.type = "cylinder";
-            param.size = [parameters.radiusTop, parameters.height];
-        }
-        else if (type == "BoxGeometry") {
-            param.type = "box";
-            param.size = [parameters.width, parameters.height, parameters.depth];
-        }
-        else if (type == "SphereGeometry") {
-            param.type = "sphere";
-            param.size = [parameters.radius];
-        }
+        // this.world = world;
+        // let type = mesh.geometry.type;
+        // let parameters = mesh.geometry.parameters;
 
-        this.body = world.add(param);
+        // let param = {
+        //     pos: [mesh.position.x, mesh.position.y, mesh.position.z],
+        //     rot: [mesh.rotation.x * TORAN, mesh.rotation.y * TORAN, mesh.rotation.z * TORAN],
+        //     move: move,
+        //     density: 1,
+        //     friction: 0.72,
+        //     restitution: 0,
+        //     belongsTo: 1,
+        //     collidesWith: 0xffffffff
+        // }
+
+        // if (type == "CylinderGeometry") {
+        //     param.type = "cylinder";
+        //     param.size = [parameters.radiusTop, parameters.height];
+        // }
+        // else if (type == "BoxGeometry") {
+        //     param.type = "box";
+        //     param.size = [parameters.width, parameters.height, parameters.depth];
+        // }
+        // else if (type == "SphereGeometry") {
+        //     param.type = "sphere";
+        //     param.size = [parameters.radius];
+        // }
+
+        // this.body = world.add(param);
+    }
+
+    step(item){
+        this.mesh.position.copy(item.position);
+        this.mesh.quaternion.copy(item.quaternion);
     }
 
     setPositon(x, y, z){
-        this.body.sleep();
-        this.body.resetPosition(x, y, z);
-        this.body.resetRotation(0, 0, 0);
+        // this.body.sleep();
+        // this.body.resetPosition(x, y, z);
+        // this.body.resetRotation(0, 0, 0);
         // this.update();
     }
 
     update() {
-        this.mesh.position.copy(this.body.getPosition());
-        this.mesh.quaternion.copy(this.body.getQuaternion());
+        // this.mesh.position.copy(this.body.getPosition());
+        // this.mesh.quaternion.copy(this.body.getQuaternion());
         // this.body.updateMesh();
         // this.destory();
     }

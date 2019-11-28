@@ -3,6 +3,7 @@ pixelRatio = Math.min(pixelRatio, 2);
 let uiWidth = windowWidth * pixelRatio;
 let uiHeight = windowHeight * pixelRatio;
 let fitScale = uiWidth / 750;
+let worker = wx.createWorker('workers/request/index.js') 
 
 let listeners = [];
 let state = {
@@ -58,5 +59,6 @@ export default {
     checkClick,
     onClick,    
     gameEvent,
-    state
+    state,
+    worker
 }
