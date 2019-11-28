@@ -282,18 +282,6 @@ export default class Main {
     }
 
     checkScore(){
-        // let sleeping = 0;
-        // this.itemViews.forEach(item => {
-        //     if(item.body.sleeping){
-        //         sleeping++;
-        //     }
-        // })
-        // if(sleeping < this.itemViews.length){
-        //     if(this.gameState == 1){
-        //         return;
-        //     }
-        // }
-        // console.log("静止");
         let rta = 180 / Math.PI;
         let total = 0;
         this.meshes.forEach(item => {
