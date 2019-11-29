@@ -2,6 +2,7 @@ import * as THREE from '../libs/three/index.js'
 
 export default class Store {
     constructor() {
+        this.total = 200;
         this.sphereGeos = [];
         this.boxGeos = [];
         this.mats = [];
@@ -30,9 +31,9 @@ export default class Store {
                 param: {
                     radiusTop: size,
                     radiusBottom: size,
-                    height: size
+                    height: size * 3.6
                 },
-                geometry: new THREE.CylinderBufferGeometry(size)
+                geometry: new THREE.CylinderBufferGeometry(size, size, size * 3.6)
             })
 
             this.geometryList.push({

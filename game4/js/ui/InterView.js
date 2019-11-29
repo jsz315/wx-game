@@ -23,21 +23,24 @@ export default class InterView {
 		this.camera.updateProjectionMatrix();
 		this.camera.lookAt(new THREE.Vector3(0, 0, 0));
 
+		const size = 1 / 1;
+
 		this.open = wx.getOpenDataContext();
 		this.sharedCanvas = this.open.canvas;
 		this.sharedCanvas.width = uiWidth;
-		this.sharedCanvas.height = uiHeight;
+		this.sharedCanvas.height = uiHeight * size;
 		this.ctx = this.sharedCanvas.getContext("2d");
 
 		this.texture = new THREE.CanvasTexture(this.sharedCanvas);
 		this.texture.minFilter = this.texture.magFilter = THREE.LinearFilter;
 		this.texture.needsUpdate = true;
 
-		let geometry = new THREE.PlaneGeometry(uiWidth, uiHeight);
+		let geometry = new THREE.PlaneGeometry(uiWidth, uiHeight * size);
 		let material = new THREE.MeshBasicMaterial({ map: this.texture, transparent: true });
 		this.material = material;
 
 		this.view = new THREE.Mesh(geometry, material);
+		this.view.position.set(0, (1 - size) / 2 * uiHeight, 0);
 		this.scene.add(this.view);
 
 		var titleTxt = new Text("💃第1关", 750 / 2, 54);
@@ -58,26 +61,14 @@ export default class InterView {
 		helpTxt.format("right", "#ffffff", 36);
 		this.uiGroup.add(helpTxt);
 
-		var shadowBtn = new Sprite('images/shadow.png', 54, 54);
-		shadowBtn.x = 30;
-		shadowBtn.y = uiHeight / fitScale - 54 - 60;
-		shadowBtn.name = "ui shadowBtn";
-		this.uiGroup.add(shadowBtn);
+		var cameraBtn = new Sprite('images/camera.png', 54, 54);
+		cameraBtn.x = 30;
+		cameraBtn.y = uiHeight / fitScale - 54 - 60;
+		cameraBtn.name = "ui cameraBtn";
+		this.uiGroup.add(cameraBtn);
 
-		// nameTxt.onClick(() => {
-			// scoreTxt.word = "score: " + Math.floor(Math.random() * 100);
-			// var obj = {};
-			// obj['defaultValue'] = '';
-			// obj['maxLength'] = 100;
-			// obj['multiple'] = true;
-			// obj['confirmHold'] = true;
-			// obj['confirmType'] = 'done';
-			// wx.showKeyboard(obj);
-		// })
-
-		shadowBtn.onClick(() => {
-			shadowBtn.fitSize();
-			DataCenter.gameEvent.emit("shadow");
+		cameraBtn.onClick(() => {
+			DataCenter.gameEvent.emit("camera");
 		})
 
 		this.startPanel = new Start();

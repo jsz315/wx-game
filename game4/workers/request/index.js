@@ -1,6 +1,6 @@
 
 const OIMO = require('../libs/oimo/index.js')
-let world, timerId, bodyList, player;
+let world, timerId, bodyList, player, explode;
 const TORAN = 180 / Math.PI;
 
 worker.onMessage(function(res) {
@@ -16,10 +16,10 @@ worker.onMessage(function(res) {
             stop();
             break;
         case 3:
-            reset(res.index, res.position);
+            resetEnemy(res.index, res.position);
             break;
         case 4:
-            addBody(res.data);
+            addEnemy(res.data);
             break;
         case 5:
             addPlayer(res.size);
@@ -28,7 +28,10 @@ worker.onMessage(function(res) {
             resetPlayer(res.position);
             break;
         case 7:
-            movePlayer(res.position);
+            movePlayer(res.velocity);
+            break;
+        case 8:
+            addExplode(res.position, res.size);
             break;
         default:
             break;
@@ -48,18 +51,45 @@ function init(){
     bodyList =[];    
 }
 
+function addExplode(position, size){
+    let pos = [position.x, position.y - size / 3, position.z];
+    if(!explode){
+        let param = {
+            type: "sphere",
+            size: [size],
+            pos: pos,
+            rot: [0, 0, 0],
+            move: true,
+            density: 40,
+            friction: 0.72,
+            restitution: 0.1,
+            belongsTo: 1,
+            collidesWith: 0xffffffff
+        }
+        explode = world.add(param);
+    }
+    else{
+        explode.resetPosition(pos[0], pos[1], pos[2]);
+        explode.resetRotation(0, 0, 0);
+    }
+    
+    explode.linearVelocity.set(0, 400, 0);
+}
+
 function play(){
     timerId && clearInterval(timerId);
-    timerId = setInterval(() => {
-        console.log("update ==");
-    }, 2000);
+    timerId = setInterval(update, 20);
 }
 
 function stop(){
     timerId && clearInterval(timerId);
+    if(explode){
+        explode.remove();
+        explode = null;
+    }
 }
 
-function reset(index, position){
+function resetEnemy(index, position){
     bodyList[index].resetPosition(position[0], position[1], position[2]);
     bodyList[index].resetRotation(0, 0, 0);
 }
@@ -69,11 +99,11 @@ function resetPlayer(position){
     player.resetRotation(0, 0, 0);
 }
 
-function movePlayer(position){
-    player.linearVelocity.set(position[0], position[1], position[2]);
+function movePlayer(velocity){
+    player.linearVelocity.set(velocity[0], velocity[1], velocity[2]);
 }
 
-function addBody(data){
+function addEnemy(data){
     let {type, parameters, position, rotation, move} = data;
 
     let param = {
@@ -136,4 +166,17 @@ function update(){
             quaternion: player.getQuaternion()
         }
     })
+}
+
+function contact() {
+    var cc = world.getContact(player, bodyList[0]);
+    if(cc){
+        if(!cc.close){
+            console.log('collision start');
+        }
+        console.log("collision...");
+    }
+    else{
+        console.log('collision end');
+    }
 }

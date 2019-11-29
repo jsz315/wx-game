@@ -20,7 +20,7 @@
 		"nodeModules": true
 	},
 	"compileType": "game",
-	"libVersion": "1.9.94",
+	"libVersion": "2.8.3",
 	"appid": "wxcea5aa956de9b2a3",
 	"projectname": "game4",
 	"simulatorType": "wechat",

@@ -3,6 +3,7 @@ import Sprite from "../component/Sprite";
 import DataCenter from "../../core/DataCenter";
 import Text from '../component/Text.js'
 let { uiWidth, uiHeight, pixelRatio, windowHeight, windowWidth, fitScale } = DataCenter;
+const TWEEN = require('../../libs/Tween.js');
 
 export default class Result{
     constructor(){
@@ -40,5 +41,12 @@ export default class Result{
         console.log("show result");
         this.group.visible = true;
         this.scoreTxt.word = n;
+        this.group.alpha = 0.4;
+        this.group.y = 100;
+		new TWEEN.Tween(this.group).to({alpha: 1, y: 0}, 0.4)
+            .easing(TWEEN.Easing.Quadratic.Out)
+            .onUpdate(()=>{})
+            .onComplete(()=>{})
+			.start();
     }
 }

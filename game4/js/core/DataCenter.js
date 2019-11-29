@@ -5,6 +5,8 @@ let uiHeight = windowHeight * pixelRatio;
 let fitScale = uiWidth / 750;
 let worker = wx.createWorker('workers/request/index.js') 
 
+
+let physicsList = [];
 let listeners = [];
 let state = {
     onGround: false
@@ -60,5 +62,6 @@ export default {
     onClick,    
     gameEvent,
     state,
-    worker
+    worker,
+    physicsList
 }

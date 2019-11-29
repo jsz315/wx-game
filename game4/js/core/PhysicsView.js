@@ -1,6 +1,6 @@
 import DataCenter from "./DataCenter";
 
-let { pixelRatio, windowHeight, windowWidth, state, worker } = DataCenter;
+let { pixelRatio, windowHeight, windowWidth, state, worker, physicsList } = DataCenter;
 const TORAN = 180 / Math.PI;
 
 export default class PhysicsView {
@@ -17,6 +17,8 @@ export default class PhysicsView {
                 rotation: mesh.rotation
             }
         })
+
+        physicsList.push(this);
 
         // this.world = world;
         // let type = mesh.geometry.type;

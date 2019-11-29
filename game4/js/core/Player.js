@@ -3,13 +3,13 @@ import * as THREE from '../libs/three/index.js'
 // const OIMO = require('../libs/oimo/index.js')
 import DataCenter from "./DataCenter";
 
-let { pixelRatio, windowHeight, windowWidth, state, worker } = DataCenter;
+let { pixelRatio, windowHeight, windowWidth, state, worker, physicsList } = DataCenter;
 const TORAN = 180 / Math.PI;
 
 export default class Player{
 
-    constructor(world){
-        this.world = world;
+    constructor(scene){
+        this.scene = scene;
         let size = 3;
         let color = new THREE.Color(0xffffff);
         let mat = new THREE.MeshStandardMaterial({ color });
@@ -45,10 +45,14 @@ export default class Player{
         this.mesh.castShadow = true;
         this.mesh.receiveShadow = true;
 
+        this.scene.add(this.mesh);
+
         worker.postMessage({
             type: 5,
             size: size
         })
+
+        // physicsList.push(this);
 
         DataCenter.gameEvent.on("toLeft", ()=>{this.moveLeft()});
         DataCenter.gameEvent.on("toRight", ()=>{this.moveRight()});
@@ -77,7 +81,7 @@ export default class Player{
         // this.body.linearVelocity.set(n.x, 0, n.y);
         worker.postMessage({
             type: 7,
-            position: [n.x, 0, n.y]
+            velocity: [n.x, 0, n.y]
         })
     }
 
