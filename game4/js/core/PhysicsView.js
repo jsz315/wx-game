@@ -4,19 +4,18 @@ let { pixelRatio, windowHeight, windowWidth, state, worker } = DataCenter;
 const TORAN = 180 / Math.PI;
 
 export default class PhysicsView {
-    constructor(mesh, move, world) {
+    constructor(mesh, move, item) {
         this.mesh = mesh;
 
         worker.postMessage({
             type: 4,
             data: {
                 move: move,
-                type: mesh.geometry.type,
-                parameters: mesh.geometry.parameters,
+                type: item.type,
+                parameters: item.param,
                 position: mesh.position,
                 rotation: mesh.rotation
             }
-            
         })
 
         // this.world = world;

@@ -8,6 +8,7 @@ import DataCenter from './core/DataCenter.js';
 import Player from './core/Player.js';
 import FollowCamera from './core/FollowCamera.js';
 import Tooler from './core/Tooler.js';
+import StartView from './core/ui/StartView.js';
 const TWEEN = require('./libs/Tween.js');
 // require('./libs/trail-renderer.js')(THREE)
 
@@ -31,9 +32,8 @@ export default class Main {
         this.canvas = canvas;
 
         this.camera = new THREE.PerspectiveCamera(60, windowWidth / windowHeight, 0.2, 2000);
-        this.camera.position.set(160, 60, 60);
+        this.camera.position.set(0, 60, 60);
         this.camera.lookAt(new THREE.Vector3());
-
         this.scene = new THREE.Scene();
 
         this.renderer = new THREE.WebGLRenderer({
@@ -76,6 +76,7 @@ export default class Main {
         this.initGround();
         this.initViews();
         this.initPlayer();
+        // this.initUI();
 
         window.requestAnimationFrame(
             this.loop.bind(this),
@@ -87,6 +88,16 @@ export default class Main {
         //     .onUpdate(()=>{this.camera.lookAt(new THREE.Vector3());})
         //     .onComplete(function(){})
         //     .start();
+    }
+
+    initUI(){
+        this.startView = new StartView();
+        // this.startView.view.position.set(0, 0, -10);
+        // this.startView.view.lookAt(new THREE.Vector3());
+        this.scene.add(this.startView.view);
+        // this.camera.add(this.startView.view);
+        // this.startView.show(this.camera);
+        this.startView.setMaterial(this.interView.material);
     }
 
     initWorker(){
@@ -207,7 +218,14 @@ export default class Main {
         ground.receiveShadow = true;
         ground.position.set(0, -8, 0);
         // ground.rotation.x = 10 * Math.PI / 180;
-        this.ground = new PhysicsView(ground, false, this.world);
+        this.ground = new PhysicsView(ground, false, {
+            type: 'box',
+            param: {
+                width: ground.geometry.parameters.width,
+                height: ground.geometry.parameters.height,
+                depth: ground.geometry.parameters.depth
+            }
+        });
         this.physicsList.push(this.ground);
 
         let leftBar = new THREE.Mesh(new THREE.BoxGeometry(2, 24, 400), mat);
@@ -216,7 +234,14 @@ export default class Main {
         leftBar.receiveShadow = true;
         leftBar.position.set(-20, -8, 0);
         // leftBar.rotation.x = 10 * Math.PI / 180;
-        this.leftBar = new PhysicsView(leftBar, false, this.world);
+        this.leftBar = new PhysicsView(leftBar, false, {
+            type: 'box',
+            param: {
+                width: leftBar.geometry.parameters.width,
+                height: leftBar.geometry.parameters.height,
+                depth: leftBar.geometry.parameters.depth
+            }
+        });
         this.physicsList.push(this.leftBar);
 
         let rightBar = new THREE.Mesh(new THREE.BoxGeometry(2, 24, 400), mat);
@@ -225,7 +250,14 @@ export default class Main {
         rightBar.receiveShadow = true;
         rightBar.position.set(20, -8, 0);
         // rightBar.rotation.x = 10 * Math.PI / 180;
-        this.rightBar = new PhysicsView(rightBar, false, this.world);
+        this.rightBar = new PhysicsView(rightBar, false, {
+            type: 'box',
+            param: {
+                width: rightBar.geometry.parameters.width,
+                height: rightBar.geometry.parameters.height,
+                depth: rightBar.geometry.parameters.depth
+            }
+        });
         this.physicsList.push(this.rightBar);
     }
 
@@ -233,14 +265,15 @@ export default class Main {
         let mesh;
         // let types = ["box", "sphere", "cylinder"];
         let types = ["cylinder", "cylinder", "cylinder"];
-        for (let i = 0; i < 80; i++) {
-            let geo = this.store.getBufferGeometry(types[i % 3]);
-            mesh = new THREE.Mesh(geo, this.store.getMaterial());
+        for (let i = 0; i < 8; i++) {
+            // let geo = this.store.getBufferGeometry(types[i % 3]);
+            let item = this.store.getBufferGeometry(types[i % 3]);
+            mesh = new THREE.Mesh(item.geometry, this.store.getMaterial());
             mesh.castShadow = true;
             mesh.receiveShadow = true;
             this.scene.add(mesh);
             mesh.position.set(0, 2, i * 10);
-            let physicsView = new PhysicsView(mesh, true, this.world);
+            let physicsView = new PhysicsView(mesh, true, item);
             this.physicsList.push(physicsView);
             this.updaters.push(physicsView);
             this.meshes.push(mesh);
@@ -336,7 +369,8 @@ export default class Main {
         var y = distY / windowWidth * 10;
         if(this.gameState == 1){
             DataCenter.gameEvent.emit("move", {x, y});
-            setTimeout(()=>{
+            this.timerId && clearTimeout(this.timerId);
+            this.timerId = setTimeout(()=>{
                 DataCenter.gameEvent.emit("gameOver");
             }, 5000);
         }
@@ -344,6 +378,8 @@ export default class Main {
     }
 
     update() {
+        // this.startView.show(this.camera);
+
         if(this.gameState){
             // this.world.step();
             this.updaters.forEach(item => {
@@ -354,9 +390,9 @@ export default class Main {
         }
         
         // TWEEN.update();
-        // this.renderer.clear();
+        this.renderer.clear();
         this.renderer.render(this.scene, this.camera);
-        // this.renderer.clearDepth();
+        this.renderer.clearDepth();
         this.interView.draw();
         this.renderer.render(this.interView.scene, this.interView.camera);
     }

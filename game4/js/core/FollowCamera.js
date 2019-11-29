@@ -28,7 +28,7 @@ export default class FollowCamera{
         }
         else{
             let z = p.z + 32;
-            this.camera.position.set(p.x, p.y + 20, z);
+            this.camera.position.set(p.x, p.y + 10, z);
             this.camera.lookAt(p);
             this.pot = p;
         }

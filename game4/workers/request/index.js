@@ -50,7 +50,9 @@ function init(){
 
 function play(){
     timerId && clearInterval(timerId);
-    timerId = setInterval(update, 20);
+    timerId = setInterval(() => {
+        console.log("update ==");
+    }, 2000);
 }
 
 function stop(){
@@ -75,6 +77,7 @@ function addBody(data){
     let {type, parameters, position, rotation, move} = data;
 
     let param = {
+        type: type,
         pos: [position.x, position.y, position.z],
         rot: [rotation._x * TORAN, rotation._y * TORAN, rotation._z * TORAN],
         move: move,
@@ -85,16 +88,13 @@ function addBody(data){
         collidesWith: 0xffffffff
     }
 
-    if (type == "CylinderGeometry") {
-        param.type = "cylinder";
+    if (type == "cylinder") {
         param.size = [parameters.radiusTop, parameters.height];
     }
-    else if (type == "BoxGeometry") {
-        param.type = "box";
+    else if (type == "box") {
         param.size = [parameters.width, parameters.height, parameters.depth];
     }
-    else if (type == "SphereGeometry") {
-        param.type = "sphere";
+    else if (type == "sphere") {
         param.size = [parameters.radius];
     }
 

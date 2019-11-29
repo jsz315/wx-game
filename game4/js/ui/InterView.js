@@ -35,6 +35,7 @@ export default class InterView {
 
 		let geometry = new THREE.PlaneGeometry(uiWidth, uiHeight);
 		let material = new THREE.MeshBasicMaterial({ map: this.texture, transparent: true });
+		this.material = material;
 
 		this.view = new THREE.Mesh(geometry, material);
 		this.scene.add(this.view);
