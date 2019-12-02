@@ -7,17 +7,19 @@ import InterView from './ui/InterView.js';
 import DataCenter from './core/DataCenter.js';
 import Player from './core/Player.js';
 import FollowCamera from './core/FollowCamera.js';
-import Tooler from './core/Tooler.js';
 import StartView from './core/ui/StartView.js';
 import Lights from './core/Lights.js';
 import Skybox from './core/Skybox.js';
 import Enemy from './core/Enemy.js';
 import Ground from './core/Ground.js';
 import Explode from './core/Explode.js';
+// import StatusView from './core/ui/StatusView.js';
+import Music from './core/Music.js';
+import UserView from './ui/UserView.js';
 const TWEEN = require('./libs/Tween.js');
 // require('./libs/trail-renderer.js')(THREE)
 
-let { pixelRatio, windowHeight, windowWidth, state, worker, physicsList } = DataCenter;
+let { pixelRatio, windowHeight, windowWidth, state, worker, physicsList, mapSize } = DataCenter;
 // let worker = wx.createWorker('workers/request/index.js') 
 
 /**
@@ -37,7 +39,7 @@ export default class Main {
         this.renderer.setClearColor(0x000000);
         this.renderer.setPixelRatio(pixelRatio);
         this.renderer.setSize(windowWidth, windowHeight);
-        this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.enabled = false;
         this.renderer.shadowMap.type = THREE.PCFShadowMap;
 
         this.gameState = 0;
@@ -48,9 +50,14 @@ export default class Main {
         this.ground = new Ground(this.scene);
         this.explode = new Explode(this.scene);
         this.interView = new InterView();
+
+        // this.userView = new UserView(canvas);
         this.lights = new Lights(this.scene);
         this.skybox = new Skybox(this.scene);
         this.followCamera = new FollowCamera(this.canvas, this.player.mesh);
+        // this.statusView = new StatusView(this.renderer, wx.getOpenDataContext().canvas);
+
+        this.music = new Music();
 
         this.initEvent();
         this.loop();
@@ -62,7 +69,7 @@ export default class Main {
         // this.startView.view.lookAt(new THREE.Vector3());
         this.scene.add(this.startView.view);
         // this.camera.add(this.startView.view);
-        this.startView.setMaterial(this.interView.material);
+        // this.startView.setMaterial(this.interView.material);
     }
 
     initEvent(){
@@ -79,6 +86,8 @@ export default class Main {
                 this.gameState = 0;
                 let score = this.checkScore();
                 this.interView.showGameOver(score);
+
+                // this.userView.showGameOver(score);
                 worker.postMessage({
                     type: 2
                 })
@@ -120,9 +129,10 @@ export default class Main {
         this.enemy.reset();
         worker.postMessage({
             type: 6,
-            position: [0, 4, 160]
+            position: [0, 4, mapSize / 2 - 40]
         })
         this.interView.showScore(0);
+        // this.userView.showScore(0);
         this.followCamera.running = true;
     }
     
@@ -158,37 +168,53 @@ export default class Main {
         var x = distX / windowWidth * 10;
         var y = distY / windowWidth * 20;
         if(this.gameState == 1){
+            this.music.playBgm();
             DataCenter.gameEvent.emit("move", {x, y});
             this.timerId && clearTimeout(this.timerId);
             this.timerId = setTimeout(()=>{
                 this.startExplode();
                 this.followCamera.running = false;
-            }, 5000);
+            }, 8400);
         }
     }
 
     startExplode(){
+        this.followCamera.playExplosion();
+        wx.vibrateShort({});
         worker.postMessage({
             type: 8,
             position: this.player.mesh.position,
             size: 40
         })
+        this.music.playExplosion();
         this.explode.play(this.player.mesh.position);
 
         this.timerId && clearTimeout(this.timerId);
         this.timerId = setTimeout(()=>{
             DataCenter.gameEvent.emit("gameOver");
+            this.music.stopBgm();
         }, 3000);
     }
 
     update() {
-        this.followCamera.update();
         TWEEN.update();
         this.renderer.clear();
+        // if(this.gameState == 0){
+        //     this.interView.draw();
+        //     this.renderer.clearDepth();
+        //     this.renderer.render(this.interView.scene, this.interView.camera);
+        // }
+        // else{
+        //     this.followCamera.update();
+        //     this.renderer.render(this.scene, this.followCamera.camera);
+        //     this.statusView.update();
+        // }
+        this.followCamera.update();
         this.renderer.render(this.scene, this.followCamera.camera);
         this.renderer.clearDepth();
         this.interView.draw();
         this.renderer.render(this.interView.scene, this.interView.camera);
+        // this.statusView.update();
     }
 
     loop() {

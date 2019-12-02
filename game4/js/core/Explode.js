@@ -11,17 +11,33 @@ export default class Explode{
 
     constructor(scene){
         this.scene = scene;
-        this.total = 120;
+        this.total = 150;
         this.list = [];
         this.store = new Store();
-        this.init();
+        this.initSphere();
     }
 
-    init(){
+    initSprite(){
+        let material = new THREE.SpriteMaterial({
+            color: 0xff9900,
+            sizeAttenuation: false,
+            map: new THREE.TextureLoader().load("images/texture/m3.jpg")
+        })
+        for (let i = 0; i < this.total; i++) {
+            let sprite = new THREE.Sprite(material);
+            sprite.position.set(100, 10, i * 10);
+            sprite.scale.multiplyScalar(Math.random() * 0.02 + 0.004);
+            this.list.push(sprite);
+            this.scene.add(sprite);
+            sprite.visible = false;
+        }
+    }
+
+    initSphere(){
         let material = new THREE.MeshStandardMaterial({ color: 0xffffff });
         material.map = new THREE.TextureLoader().load("images/texture/m3.jpg");
         for (let i = 0; i < this.total; i++) {
-            let item = this.store.getBufferGeometry("box");
+            let item = this.store.getBufferGeometry("sphere");
             // let material = new THREE.MeshBasicMaterial({
             //     color: Math.floor(Math.random() * 0xffffff),
             //     opacity: 1
@@ -44,9 +60,9 @@ export default class Explode{
             item.position.set(x, y, z);
             item.visible = true;
             new TWEEN.Tween(item.position).to({
-                x: x + (0.5 - Math.random()) * 120,
-                y: y + (1 - Math.random()) * 120,
-                z: z + (0.5 - Math.random()) * 120
+                x: x + (0.5 - Math.random()) * 300,
+                y: y + (1 - Math.random()) * 200,
+                z: z + (0.5 - Math.random()) * 300
             }, 1)
             .onUpdate(()=>{})
             .onComplete(()=>{item.visible = false;})

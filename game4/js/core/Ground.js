@@ -5,7 +5,7 @@ import PhysicsView from '../core/PhysicsView.js';
 
 const TWEEN = require('../libs/Tween.js');
 let OrbitControls = require('../../miniprogram_npm/three-orbit-controls/index.js')(THREE)
-let { pixelRatio, windowHeight, windowWidth, state, worker } = DataCenter;
+let { pixelRatio, windowHeight, windowWidth, state, worker, mapSize } = DataCenter;
 
 export default class Ground{
 
@@ -18,10 +18,10 @@ export default class Ground{
         var mat = new THREE.MeshStandardMaterial({ color: 0xffffff });
         mat.map = new THREE.TextureLoader().load("images/texture/m4.jpg");
         mat.map.wrapS = mat.map.wrapT = THREE.RepeatWrapping;
-        mat.map.repeat.set(10, 60);
+        mat.map.repeat.set(4, mapSize / 100 * 4);
         mat.emissive = new THREE.Color(0, 0, 0);
 
-        let ground = new THREE.Mesh(new THREE.BoxGeometry(200, 8, 1200), mat);
+        let ground = new THREE.Mesh(new THREE.BoxGeometry(100, 8, mapSize), mat);
         this.scene.add(ground);
         ground.castShadow = true;
         ground.receiveShadow = true;
@@ -35,7 +35,22 @@ export default class Ground{
             }
         });
 
-        let leftBar = new THREE.Mesh(new THREE.BoxGeometry(2, 24, 1200), mat);
+        let angle = new THREE.Mesh(new THREE.BoxGeometry(20, 10, 40), mat);
+        this.scene.add(angle);
+        angle.castShadow = true;
+        angle.receiveShadow = true;
+        angle.position.set(0, -8, 0);
+        angle.rotation.x = 15 * Math.PI / 180;
+        this.angle = new PhysicsView(angle, false, {
+            type: 'box',
+            param: {
+                width: angle.geometry.parameters.width,
+                height: angle.geometry.parameters.height,
+                depth: angle.geometry.parameters.depth
+            }
+        });
+
+        let leftBar = new THREE.Mesh(new THREE.BoxGeometry(2, 24, mapSize), mat);
         this.scene.add(leftBar);
         leftBar.castShadow = true;
         leftBar.receiveShadow = true;
@@ -49,7 +64,7 @@ export default class Ground{
             }
         });
 
-        let rightBar = new THREE.Mesh(new THREE.BoxGeometry(2, 24, 1200), mat);
+        let rightBar = new THREE.Mesh(new THREE.BoxGeometry(2, 24, mapSize), mat);
         this.scene.add(rightBar);
         rightBar.castShadow = true;
         rightBar.receiveShadow = true;

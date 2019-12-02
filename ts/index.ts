@@ -10,4 +10,11 @@ let mat:THREE.MeshBasicMaterial = new THREE.MeshBasicMaterial({
 	opacity: 1
 })
 
-mat.opacity
+
+
+let material = new THREE.SpriteMaterial({
+    color: 0xff9900,
+	sizeAttenuation: false
+})
+let sprite = new THREE.Sprite(material);
+sprite.visible = false;

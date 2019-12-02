@@ -5,13 +5,13 @@ import PhysicsView from '../core/PhysicsView.js';
 
 const TWEEN = require('../libs/Tween.js');
 let OrbitControls = require('../../miniprogram_npm/three-orbit-controls/index.js')(THREE)
-let { pixelRatio, windowHeight, windowWidth, state, worker, physicsList } = DataCenter;
+let { pixelRatio, windowHeight, windowWidth, state, worker, physicsList, mapSize } = DataCenter;
 
 export default class Enemy{
 
     constructor(scene){
         this.scene = scene;
-        this.total = 200;
+        this.total = 100;
         this.list = [];
         this.store = new Store();
         this.init();
@@ -61,7 +61,7 @@ export default class Enemy{
             let z = row * -distance;
             if(i > 10){
                 x = (0.5 - Math.random()) * 30;
-                z = -40 - Math.random() * 500;
+                z = (0.5 - Math.random()) * (mapSize / 2 - 100) - 100;
             }
             this.list[i].setPositon(x, y, z);
 

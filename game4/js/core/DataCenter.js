@@ -4,7 +4,7 @@ let uiWidth = windowWidth * pixelRatio;
 let uiHeight = windowHeight * pixelRatio;
 let fitScale = uiWidth / 750;
 let worker = wx.createWorker('workers/request/index.js') 
-
+let mapSize = 1800;
 
 let physicsList = [];
 let listeners = [];
@@ -63,5 +63,6 @@ export default {
     gameEvent,
     state,
     worker,
-    physicsList
+    physicsList,
+    mapSize
 }

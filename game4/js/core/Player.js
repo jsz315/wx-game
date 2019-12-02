@@ -3,7 +3,7 @@ import * as THREE from '../libs/three/index.js'
 // const OIMO = require('../libs/oimo/index.js')
 import DataCenter from "./DataCenter";
 
-let { pixelRatio, windowHeight, windowWidth, state, worker, physicsList } = DataCenter;
+let { pixelRatio, windowHeight, windowWidth, state, worker, physicsList, mapSize } = DataCenter;
 const TORAN = 180 / Math.PI;
 
 export default class Player{

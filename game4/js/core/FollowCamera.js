@@ -2,7 +2,7 @@ import * as THREE from '../libs/three/index.js'
 import DataCenter from './DataCenter.js';
 const TWEEN = require('../libs/Tween.js');
 let OrbitControls = require('../../miniprogram_npm/three-orbit-controls/index.js')(THREE)
-let { pixelRatio, windowHeight, windowWidth, state, worker } = DataCenter;
+let { pixelRatio, windowHeight, windowWidth, state, worker, mapSize } = DataCenter;
 
 export default class FollowCamera{
 
@@ -17,6 +17,9 @@ export default class FollowCamera{
         this.orbitControls = new OrbitControls(this.camera, canvas);
         this.control = false;
         this.orbitControls.enabled = this.control;
+
+        this.explodeStart = false;
+        this.explodeFrame = 0;
     }
 
     toggleControl(){
@@ -34,11 +37,33 @@ export default class FollowCamera{
         //     .start();
     }
 
+    playExplosion(){
+        if(!this.explodeStart){
+            this.explodeFrame = 0;
+            this.explodeStart = true;
+            this.explodePot = this.camera.position.clone();
+        }
+    }
+
     update(){
         if(!this.control){
             let p = this.target.position;
+
+            if(this.explodeStart){
+                if(++this.explodeFrame < 60){
+                    this.camera.position.set(
+                        this.explodePot.x + (0.5 - Math.random()),
+                        this.explodePot.y + (0.5 - Math.random()),
+                        this.explodePot.z + (0.5 - Math.random())
+                    );
+                }
+                else{
+                    this.camera.position.copy(this.explodePot);
+                    this.explodeStart = false;
+                }
+            }
         
-            if(p.z < -480){
+            if(p.z < -mapSize * 0.4){
                 // this.camera.lookAt(new THREE.Vector3());
                 // this.camera.lookAt(new THREE.Vector3());
                 // new TWEEN.Tween(this.pot).to({x: 0, y: 4, z: 10}, 1)

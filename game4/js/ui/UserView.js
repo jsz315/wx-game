@@ -11,43 +11,21 @@ const TWEEN = require('../libs/Tween.js');
 
 let { uiWidth, uiHeight, pixelRatio, windowHeight, windowWidth, fitScale } = DataCenter;
 
-let updateFrame = 0;
+export default class UserView {
+    constructor(canvas){
 
-export default class InterView {
+        this.canvas = canvas;
+        this.canvas.width = uiWidth;
+        this.canvas.height = uiHeight;
+        this.ctx = this.canvas.getContext("2d");
 
-	constructor() {
-		this.stats = new Tooler.Stats();
-		this.score = 0;
-		this.uiGroup = new Group(0, 0);
+        this.uiGroup = new Group(0, 0);
 
-		this.scene = new THREE.Scene();
-		this.camera = new THREE.OrthographicCamera(uiWidth / -2, uiWidth / 2, uiHeight / 2, uiHeight / -2, 0, 10000);
-		this.camera.updateProjectionMatrix();
-		this.camera.lookAt(new THREE.Vector3(0, 0, 0));
-
-		this.open = wx.getOpenDataContext();
-		this.sharedCanvas = this.open.canvas;
-		this.sharedCanvas.width = uiWidth;
-		this.sharedCanvas.height = uiHeight;
-		this.ctx = this.sharedCanvas.getContext("2d");
-
-		this.texture = new THREE.CanvasTexture(this.sharedCanvas);
-		this.texture.minFilter = this.texture.magFilter = THREE.LinearFilter;
-		this.texture.needsUpdate = true;
-
-		let geometry = new THREE.PlaneGeometry(uiWidth, uiHeight);
-		let material = new THREE.MeshBasicMaterial({ map: this.texture, transparent: true });
-		this.material = material;
-
-		this.view = new THREE.Mesh(geometry, material);
-		this.view.position.set(0, 0, 0);
-		this.scene.add(this.view);
-
-		var titleTxt = new Text("💃第1关", 750 / 2, 54);
+        var titleTxt = new Text("💃第1关", 750 / 2, 54);
 		titleTxt.format("center", "#ffffff", 36);
 		this.uiGroup.add(titleTxt);
 
-		this.fpsTxt = new Text("", 30, 72);
+		this.fpsTxt = new Text("球球", 30, 72);
 		this.fpsTxt.format("left", "#ffffff", 36);
 		this.uiGroup.add(this.fpsTxt);
 
@@ -77,38 +55,29 @@ export default class InterView {
 		this.resultPanel = new Result();
 		this.resultPanel.group.visible = false;
 		this.uiGroup.add(this.resultPanel.group);
+        
+    }
 
-		// this.startPanel.group.alpha = 0;
-		// new TWEEN.Tween(this.startPanel.group).to({alpha: 1}, 1)
-        //     .easing(TWEEN.Easing.Quadratic.Out)
-        //     .onUpdate(()=>{})
-        //     .onComplete(()=>{})
-		// 	.start();
-	}
-
-	showScore(n){
+    showScore(n){
 		this.score = n;
 		this.scoreTxt.word = "score: " + this.score;
 	}
 
-	showGameOver(n){
+    showGameOver(n){
 		this.showScore(n);
 		this.resultPanel.show(n);
 	}
 
 	draw() {
-		this.stats.update();
-		this.fpsTxt.word = "FPS: " + this.stats.data;
+		// this.stats.update();
+		// this.fpsTxt.word = "FPS: " + this.stats.data;
 		this.ctx.clearRect(0, 0, uiWidth, uiHeight);
 		// this.uiGroup.forEach(item => {
 		// 	item.draw(this.ctx);
 		// })
 		this.uiGroup.draw(this.ctx);
-
-		if(++updateFrame > 60){
-			updateFrame = 0;
-			this.texture.needsUpdate = true;
-		}
-		
+		// this.texture.needsUpdate = true;
 	}
+
+
 }
