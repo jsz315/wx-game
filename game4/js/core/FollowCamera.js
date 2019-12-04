@@ -38,6 +38,7 @@ export default class FollowCamera{
     }
 
     playExplosion(){
+        this.running = false;
         if(!this.explodeStart){
             this.explodeFrame = 0;
             this.explodeStart = true;

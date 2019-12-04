@@ -80,6 +80,11 @@ export default class Main {
             this.followCamera.toggleControl();
         })
 
+        DataCenter.gameEvent.on("explode", () => {
+            // this.followCamera.toggleControl();
+            this.startExplode();
+        })
+
         DataCenter.gameEvent.on("gameOver", () => {
             console.log("on game over");
             if(this.gameState){
@@ -170,11 +175,10 @@ export default class Main {
         if(this.gameState == 1){
             this.music.playBgm();
             DataCenter.gameEvent.emit("move", {x, y});
-            this.timerId && clearTimeout(this.timerId);
-            this.timerId = setTimeout(()=>{
-                this.startExplode();
-                this.followCamera.running = false;
-            }, 8400);
+            // this.timerId && clearTimeout(this.timerId);
+            // this.timerId = setTimeout(()=>{
+            //     this.startExplode();
+            // }, 8400);
         }
     }
 
@@ -193,7 +197,7 @@ export default class Main {
         this.timerId = setTimeout(()=>{
             DataCenter.gameEvent.emit("gameOver");
             this.music.stopBgm();
-        }, 3000);
+        }, 4000);
     }
 
     update() {

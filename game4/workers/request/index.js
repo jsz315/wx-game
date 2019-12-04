@@ -79,9 +79,12 @@ function addExplode(position, size){
 function play(){
     timerId && clearInterval(timerId);
     timerId = setInterval(update, 20);
+
+    // timerId = requestAnimationFrame(update);
 }
 
 function stop(){
+    // cancelRequestAnimationFrame(timerId);
     timerId && clearInterval(timerId);
     if(explode){
         explode.remove();
