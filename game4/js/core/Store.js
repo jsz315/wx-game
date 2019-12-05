@@ -1,4 +1,6 @@
 import * as THREE from '../libs/three/index.js'
+import DataCenter from "./DataCenter";
+const TWEEN = require('../libs/Tween.js');
 
 export default class Store {
     constructor() {
@@ -49,7 +51,8 @@ export default class Store {
             let color = new THREE.Color(0xffffff);
             let material = new THREE.MeshStandardMaterial({ color });
             material.map = new THREE.TextureLoader().load("images/texture/m" + 5 + ".jpg");
-            material.emissive = new THREE.Color(0, 0, 0);
+            material.emissive = new THREE.Color(1, 1, 1);
+            material.emissiveIntensity = 0;
             material.metalness = 0.1;
             material.roughness = 0.7;
 
@@ -71,6 +74,14 @@ export default class Store {
         //     param.type = "sphere";
         //     param.size = [parameters.radius];
         // }
+
+        // DataCenter.gameEvent.on("explode", () => {
+        //     // this.followCamera.toggleControl();
+        //     let mat = this.getMaterial();
+        //     new TWEEN.Tween(mat).to({emissiveIntensity: 1}, 1)
+        //     .onComplete(()=>{mat.emissiveIntensity = 0;})
+        //     .start();
+        // })
 
     }
 

@@ -5,7 +5,7 @@ import PhysicsView from '../core/PhysicsView.js';
 
 const TWEEN = require('../libs/Tween.js');
 let OrbitControls = require('../../miniprogram_npm/three-orbit-controls/index.js')(THREE)
-let { pixelRatio, windowHeight, windowWidth, state, worker, physicsList, mapSize } = DataCenter;
+let { pixelRatio, windowHeight, windowWidth, state, worker, physicsList, mapSize, explodeMaterials } = DataCenter;
 
 export default class Enemy{
 
@@ -18,9 +18,11 @@ export default class Enemy{
     }
 
     init(){
+        let mat = this.store.getMaterial();
+        explodeMaterials.push(mat);
         for (let i = 0; i < this.total; i++) {
             let item = this.store.getBufferGeometry("cylinder");
-            let mesh = new THREE.Mesh(item.geometry, this.store.getMaterial());
+            let mesh = new THREE.Mesh(item.geometry, mat);
             mesh.castShadow = true;
             mesh.receiveShadow = true;
             mesh.position.set(0, 4, i * 10);

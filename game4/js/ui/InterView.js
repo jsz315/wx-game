@@ -16,6 +16,7 @@ let updateFrame = 0;
 export default class InterView {
 
 	constructor() {
+		this.space = 60;
 		this.stats = new Tooler.Stats();
 		this.score = 0;
 		this.uiGroup = new Group(0, 0);
@@ -86,12 +87,19 @@ export default class InterView {
 		// 	.start();
 	}
 
+	reset(){
+		this.space = 60;
+		this.showScore(0);
+		this.draw();
+	}
+
 	showScore(n){
 		this.score = n;
 		this.scoreTxt.word = "score: " + this.score;
 	}
 
 	showGameOver(n){
+		this.space = 3;
 		this.showScore(n);
 		this.resultPanel.show(n);
 	}
@@ -105,7 +113,7 @@ export default class InterView {
 		// })
 		this.uiGroup.draw(this.ctx);
 
-		if(++updateFrame > 60){
+		if(++updateFrame > this.space){
 			updateFrame = 0;
 			this.texture.needsUpdate = true;
 		}

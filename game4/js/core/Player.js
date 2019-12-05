@@ -3,7 +3,7 @@ import * as THREE from '../libs/three/index.js'
 // const OIMO = require('../libs/oimo/index.js')
 import DataCenter from "./DataCenter";
 
-let { pixelRatio, windowHeight, windowWidth, state, worker, physicsList, mapSize } = DataCenter;
+let { pixelRatio, windowHeight, windowWidth, state, worker, physicsList, mapSize, explodeMaterials } = DataCenter;
 const TORAN = 180 / Math.PI;
 
 export default class Player{
@@ -12,12 +12,15 @@ export default class Player{
         this.scene = scene;
         let size = 3;
         let color = new THREE.Color(0xffffff);
+        
         let mat = new THREE.MeshStandardMaterial({ color });
         mat.map = new THREE.TextureLoader().load("images/texture/m3.jpg");
-        mat.emissive = new THREE.Color(0, 0, 0);
+        mat.emissive = new THREE.Color(1, 1, 1);
+        mat.emissiveIntensity = 0;
         mat.metalness = 0.1;
         mat.roughness = 0.4;
-
+        explodeMaterials.push(mat);
+        
         // let param = {
         //     pos: [0, 0, 0],
         //     rot: [0, 0, 0],

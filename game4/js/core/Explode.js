@@ -5,7 +5,7 @@ import PhysicsView from '../core/PhysicsView.js';
 
 const TWEEN = require('../libs/Tween.js');
 let OrbitControls = require('../../miniprogram_npm/three-orbit-controls/index.js')(THREE)
-let { pixelRatio, windowHeight, windowWidth, state, worker, physicsList } = DataCenter;
+let { pixelRatio, windowHeight, windowWidth, state, worker, physicsList, explodeMaterials } = DataCenter;
 
 export default class Explode{
 
@@ -68,6 +68,12 @@ export default class Explode{
             .onComplete(()=>{item.visible = false;})
             .start();
         }
+
+        explodeMaterials.forEach(mat=>{
+            new TWEEN.Tween(mat).to({emissiveIntensity: 1}, 1)
+            .onComplete(()=>{mat.emissiveIntensity = 0;})
+            .start();
+        })
     }
 
     reset(){

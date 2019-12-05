@@ -12,6 +12,8 @@ let state = {
     onGround: false
 }
 
+let explodeMaterials = [];
+
 function checkClick(x, y) {
     x = x * pixelRatio;
     y = y * pixelRatio;
@@ -64,5 +66,6 @@ export default {
     state,
     worker,
     physicsList,
-    mapSize
+    mapSize,
+    explodeMaterials
 }

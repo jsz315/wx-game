@@ -60,7 +60,7 @@ export default class Main {
 
         this.music = new Music();
         this.role = new Role(this.scene);
-        this.role.loadObj("http://192.168.31.109:3000/obj/fbx/Running.fbx");
+        // this.role.loadObj("http://192.168.31.109:3000/obj/fbx/Running.fbx");
 
         this.initEvent();
         this.loop();
@@ -139,7 +139,7 @@ export default class Main {
             type: 6,
             position: [0, 4, mapSize / 2 - 40]
         })
-        this.interView.showScore(0);
+        this.interView.reset();
         // this.userView.showScore(0);
         this.followCamera.running = true;
     }
