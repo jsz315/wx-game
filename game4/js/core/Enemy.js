@@ -11,7 +11,7 @@ export default class Enemy{
 
     constructor(scene){
         this.scene = scene;
-        this.total = 100;
+        this.total = 200;
         this.list = [];
         this.store = new Store();
         this.init();

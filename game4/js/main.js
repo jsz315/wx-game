@@ -13,6 +13,7 @@ import Skybox from './core/Skybox.js';
 import Enemy from './core/Enemy.js';
 import Ground from './core/Ground.js';
 import Explode from './core/Explode.js';
+import Role from './core/Role.js';
 // import StatusView from './core/ui/StatusView.js';
 import Music from './core/Music.js';
 import UserView from './ui/UserView.js';
@@ -58,6 +59,8 @@ export default class Main {
         // this.statusView = new StatusView(this.renderer, wx.getOpenDataContext().canvas);
 
         this.music = new Music();
+        this.role = new Role(this.scene);
+        this.role.loadObj("http://192.168.31.109:3000/obj/fbx/Running.fbx");
 
         this.initEvent();
         this.loop();
