@@ -36,6 +36,10 @@ export default class Explode{
     initSphere(){
         let material = new THREE.MeshStandardMaterial({ color: 0xffffff });
         material.map = new THREE.TextureLoader().load("images/texture/m3.jpg");
+        material.emissive = new THREE.Color(1, 1, 1);
+        material.emissiveIntensity = 0;
+        explodeMaterials.push(material);
+        
         for (let i = 0; i < this.total; i++) {
             let item = this.store.getBufferGeometry("sphere");
             // let material = new THREE.MeshBasicMaterial({

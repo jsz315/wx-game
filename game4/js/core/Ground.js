@@ -5,7 +5,7 @@ import PhysicsView from '../core/PhysicsView.js';
 
 const TWEEN = require('../libs/Tween.js');
 let OrbitControls = require('../../miniprogram_npm/three-orbit-controls/index.js')(THREE)
-let { pixelRatio, windowHeight, windowWidth, state, worker, mapSize } = DataCenter;
+let { pixelRatio, windowHeight, windowWidth, state, worker, mapSize, explodeMaterials } = DataCenter;
 
 export default class Ground{
 
@@ -19,7 +19,9 @@ export default class Ground{
         mat.map = new THREE.TextureLoader().load("images/texture/m4.jpg");
         mat.map.wrapS = mat.map.wrapT = THREE.RepeatWrapping;
         mat.map.repeat.set(4, mapSize / 100 * 4);
-        mat.emissive = new THREE.Color(0, 0, 0);
+        mat.emissive = new THREE.Color(1, 1, 1);
+        mat.emissiveIntensity = 0;
+        explodeMaterials.push(mat);
 
         let ground = new THREE.Mesh(new THREE.BoxGeometry(100, 8, mapSize), mat);
         this.scene.add(ground);
