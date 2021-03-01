@@ -2,7 +2,7 @@
   "dependencies": {
     "hammerjs": "^2.0.8",
     "oimo": "^1.0.9",
-    "three": "^0.110.0",
+    "three": "^0.125.0",
     "typescript": "^3.7.2"
   },
   "miniprogram": "miniprogram_npm",
