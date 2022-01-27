@@ -12,10 +12,10 @@ oimo@^1.0.9:
   resolved "https://registry.npm.taobao.org/oimo/download/oimo-1.0.9.tgz#0b592e361c799103fdb04fb3be1264245ef6884b"
   integrity sha1-C1kuNhx5kQP9sE+zvhJkJF72iEs=
 
-three@^0.110.0:
-  version "0.110.0"
-  resolved "https://registry.npm.taobao.org/three/download/three-0.110.0.tgz#8719591de1336269113ee79f4268ba247b2324f8"
-  integrity sha1-hxlZHeEzYmkRPuefQmi6JHsjJPg=
+three@^0.137.0:
+  version "0.137.0"
+  resolved "https://registry.yarnpkg.com/three/-/three-0.137.0.tgz#0ebd6ba66637a332c31f234bcdd35aeec071a6e3"
+  integrity sha512-rzSDhia6cU35UCy6y+zEEws6vSgytfHqFMSaBvUcySgzwvDO6vETyswtSNi/+aVqJw8WLMwyT1mlQQ1T/dxxOA==
 
 typescript@^3.7.2:
   version "3.7.2"
